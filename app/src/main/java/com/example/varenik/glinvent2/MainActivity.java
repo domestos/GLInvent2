@@ -12,16 +12,20 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 
-import com.example.varenik.glinvent2.fragments.ManageFragment;
+import com.example.varenik.glinvent2.fragments.manage.ManageFragment;
+import com.example.varenik.glinvent2.fragments.scan.ScanFragment;
 import com.example.varenik.glinvent2.model.Values;
 
-public class MainActivity extends AppCompatActivity implements ManageFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements
+                        ManageFragment.OnFragmentInteractionListener,
+                        ScanFragment.OnFragmentInteractionListener {
 
     private TextView mTextMessage;
     /**
      * fragments
      */
    private ManageFragment  manageFragment;
+   private ScanFragment scanFragment;
 
    private SharedPreferences sharedPreferences;
 
@@ -42,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements ManageFragment.On
 
     private void initFtagment() {
         manageFragment = new ManageFragment();
+        scanFragment = new ScanFragment();
+
 
 
     }
@@ -54,10 +60,10 @@ public class MainActivity extends AppCompatActivity implements ManageFragment.On
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             switch (item.getItemId()) {
                 case R.id.navigation_scan:
-                    mTextMessage.setText(R.string.title_home);
+                    fragmentTransaction.replace(R.id.container, scanFragment).commit();
                     return true;
                 case R.id.navigation_sync:
-                    mTextMessage.setText(R.string.title_dashboard);
+                    mTextMessage.setText(R.string.title_sync);
                     return true;
                 case R.id.navigation_user:
 

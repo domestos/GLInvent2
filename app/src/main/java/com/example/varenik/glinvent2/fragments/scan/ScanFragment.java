@@ -1,27 +1,25 @@
-package com.example.varenik.glinvent2.fragments;
+package com.example.varenik.glinvent2.fragments.scan;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
+
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 
 import com.example.varenik.glinvent2.R;
-import com.example.varenik.glinvent2.model.Values;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link ManageFragment.OnFragmentInteractionListener} interface
+ * {@link ScanFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ManageFragment#newInstance} factory method to
+ * Use the {@link ScanFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ManageFragment extends android.support.v4.app.Fragment implements View.OnClickListener {
+public class ScanFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -31,17 +29,9 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
     private String mParam1;
     private String mParam2;
 
-    /**
-     * My values
-     */
-    private Button savaButton;
-    private EditText etServerUrl;
-
-
     private OnFragmentInteractionListener mListener;
 
-
-    public ManageFragment() {
+    public ScanFragment() {
         // Required empty public constructor
     }
 
@@ -51,11 +41,11 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ManageFragment.
+     * @return A new instance of fragment ScanFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ManageFragment newInstance(String param1, String param2) {
-        ManageFragment fragment = new ManageFragment();
+    public static ScanFragment newInstance(String param1, String param2) {
+        ScanFragment fragment = new ScanFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -75,28 +65,9 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_manage, container,false);
-        loadAllValues();
-        initAllViews(view);
-        return view;
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_scan, container, false);
     }
-
-    private void loadAllValues() {
-        loadURLHost();
-
-    }
-
-    private void initAllViews(View view) {
-        savaButton = view.findViewById(R.id.save_url);
-        savaButton.setOnClickListener(this);
-        etServerUrl = view.findViewById(R.id.etServerUrl);
-        etServerUrl.setText(Values.host);
-
-
-    }
-
-
-
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -104,23 +75,6 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
             mListener.onFragmentInteraction(uri);
         }
     }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void saveURLHost(String url) {
-        if (mListener != null) {
-            mListener.saveURLHost(url);
-        }
-    }
-
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void loadURLHost() {
-        if (mListener != null) {
-            mListener.loadURLHost();
-        }
-
-    }
-
 
     @Override
     public void onAttach(Context context) {
@@ -139,15 +93,6 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
         mListener = null;
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.save_url:
-               saveURLHost(etServerUrl.getText().toString());
-                break;
-        }
-    }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -161,10 +106,5 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
-
-        void saveURLHost(String url);
-
-        void loadURLHost();
-
     }
 }
