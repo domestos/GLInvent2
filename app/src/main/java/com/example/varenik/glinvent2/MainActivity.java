@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.example.varenik.glinvent2.fragments.manage.ManageFragment;
 import com.example.varenik.glinvent2.fragments.scan.ScanFragment;
+import com.example.varenik.glinvent2.fragments.sync.SyncFragment;
 import com.example.varenik.glinvent2.model.Values;
 
 public class MainActivity extends AppCompatActivity implements
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements
      */
    private ManageFragment  manageFragment;
    private ScanFragment scanFragment;
+   private SyncFragment syncFragment;
 
    private SharedPreferences sharedPreferences;
 
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements
     private void initFtagment() {
         manageFragment = new ManageFragment();
         scanFragment = new ScanFragment();
-
+        syncFragment = new SyncFragment();
 
 
     }
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements
                     fragmentTransaction.replace(R.id.container, scanFragment).commit();
                     return true;
                 case R.id.navigation_sync:
-                    mTextMessage.setText(R.string.title_sync);
+                    fragmentTransaction.replace(R.id.container, syncFragment).commit();
                     return true;
                 case R.id.navigation_user:
 
