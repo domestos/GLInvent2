@@ -32,6 +32,7 @@ public class SyncFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v =inflater.inflate(R.layout.fragment_sync, container,false);
+
         myrecyclerview = v.findViewById(R.id.container_recyclerview);
         RecyclerViewAdapter recyclerViewAdapter  =  new RecyclerViewAdapter(getContext(), listDevice);
         myrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));

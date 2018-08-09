@@ -17,6 +17,8 @@ import com.example.varenik.glinvent2.fragments.scan.ScanFragment;
 import com.example.varenik.glinvent2.fragments.sync.SyncFragment;
 import com.example.varenik.glinvent2.model.Values;
 
+import java.util.Date;
+
 public class MainActivity extends AppCompatActivity implements
                         ManageFragment.OnFragmentInteractionListener,
                         ScanFragment.OnFragmentInteractionListener {
@@ -106,5 +108,20 @@ public class MainActivity extends AppCompatActivity implements
         sharedPreferences = getPreferences(MODE_PRIVATE);
         Values.host = sharedPreferences.getString("URL", "");
         Values.concatUrl(Values.host);
+        // load last sync date
+        Values.lastSyncDate = sharedPreferences.getString("SyncDate", "");
+
+    }
+
+    @Override
+    public void saveDateSync() {
+        Date date = new Date();
+        Log.d(Values.TAG_LOG, "Main Activity: run saveDateSync ||  "+date.toString() );
+
+        sharedPreferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor spEditDate = sharedPreferences.edit();
+        spEditDate.putString("SyncDate", date.toString());
+        spEditDate.commit();
+        Values.lastSyncDate = date.toString();
     }
 }

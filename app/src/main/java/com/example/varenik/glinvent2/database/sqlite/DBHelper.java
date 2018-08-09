@@ -13,7 +13,7 @@ import com.example.varenik.glinvent2.model.Values;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION =0;
+    public static final int DATABASE_VERSION =1;
     public static final String DATABASE_NAME="wp_gameloft";
     public static final String TABLE_INVENTORY="wp_inventory";
     public static final String TABLE_USERS="wp_employees";

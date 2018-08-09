@@ -15,6 +15,7 @@ public class Values extends Application{
     public static final int STATUS_SYNC_ONLINE = 0;
     public static final int STATUS_SYNC_OFFLINE = 1;
     public static final String STATUS_FINED= "ok";
+    public static String lastSyncDate = "none";
 
 
     public static void concatUrl(String url_host) {
