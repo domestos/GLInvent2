@@ -1,7 +1,6 @@
 package com.example.varenik.glinvent2.fragments.manage;
 
-import android.content.Context;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +11,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.varenik.glinvent2.R;
 import com.example.varenik.glinvent2.database.mysql.MySQLConnect;
 import com.example.varenik.glinvent2.database.sqlite.SQLiteConnect;
@@ -24,33 +27,62 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class ManageFragment extends android.support.v4.app.Fragment implements View.OnClickListener {
 
-    private OnFragmentInteractionListener mListener;
     private Button savaButton, btnSync;
     private EditText etServerUrl;
-    private TextView tvDeviceServer,
-            tvUsersServer,
-            tvDevicesPhone,
-                     tvUsersRowInSQLite,
-                     tvConnectStatus,
-                     tvSyncStatus;
+    private TextView tvDevicesRowInMYSQL, tvUsersRowInMYSQL, tvDevicesRowInSQLite, tvUsersRowInSQLite, tvConnectStatus, tvSyncStatus;
     //DataBase
     private SQLiteConnect sqLiteConnect;
     private MySQLConnect mySQLConnect;
     //Arrays
     private List<Device> devicesFromPhone, devicesFromServer;
-    private List<User>   usersFromPhone,  eusersFromServer;
+    private List<User>   usersFromPhone,   usersFromServer;
+    private SharedPreferences sharedPreferences;
 
 
-    /*========== INI ALL VIEW ELEMENTS===============*/
+    public ManageFragment() {
+        // Required empty public constructor
+    }
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        loadAllValues();
+    }
+    private void loadAllValues() {
+        loadURLHost();
+        loadDateSync();
+        // get ALL Items and Users from MYSQL
+        mySQLConnect = MySQLConnect.getInstance(getContext());
+        devicesFromServer = getAllItemsFromMySQL();
+        usersFromServer = getAllUsersFromMySQL();
+        // get ALL Items from SQLite
+        sqLiteConnect = SQLiteConnect.getInstance(getContext());
+        devicesFromPhone = sqLiteConnect.getAllItemsFromSQLite();
+        usersFromPhone = sqLiteConnect.getAllUsersFromSQLite();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_manage, container, false);
+        initAllViews(view);
+        showAllInfo();
+        return view;
+    }
+
     private void initAllViews(View view) {
         savaButton = view.findViewById(R.id.btnSaveUrl);
         savaButton.setOnClickListener(this);
 
-        btnSync= view.findViewById(R.id.btnSync);
+        btnSync = view.findViewById(R.id.btnSync);
         btnSync.setOnClickListener(this);
 
         etServerUrl = view.findViewById(R.id.etServerUrl);
@@ -59,94 +91,18 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
         tvConnectStatus = view.findViewById(R.id.tvConnectStatus);
         tvSyncStatus = view.findViewById(R.id.tvSyncStatus);
 
-        tvDeviceServer = view.findViewById(R.id.tvDevicesRowInMYSQL);
-        tvUsersServer = view.findViewById(R.id.tvUsersRowInMYSQL);
+        tvDevicesRowInMYSQL = view.findViewById(R.id.tvDevicesRowInMYSQL);
+        tvUsersRowInMYSQL = view.findViewById(R.id.tvUsersRowInMYSQL);
 
-        tvDevicesPhone = view.findViewById(R.id.tvDevicesRowInSQLite);
+        tvDevicesRowInSQLite = view.findViewById(R.id.tvDevicesRowInSQLite);
         tvUsersRowInSQLite = view.findViewById(R.id.tvUsersRowInSQLite);
-
-    }
-
-    public ManageFragment() {
-        // Required empty public constructor
-    }
-
-    public static ManageFragment newInstance(String param1, String param2) {
-        ManageFragment fragment = new ManageFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//            mParam1 = getArguments().getString(ARG_PARAM1);
-//            mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
-        loadAllValues();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_manage, container,false);
-        initAllViews(view);
-
-        return view;
-    }
-
-    private void loadAllValues() {
-        loadURLHost();
-    }
-
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void saveURLHost(String url) {
-        if (mListener != null) {
-            mListener.saveURLHost(url);
-        }
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void loadURLHost() {
-        if (mListener != null) {
-            mListener.loadURLHost();
-        }
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    private void saveDateSync() {
-        if (mListener != null) {
-            mListener.saveDateSync();
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSaveUrl:
-               saveURLHost(etServerUrl.getText().toString());
+                saveURLHost(etServerUrl.getText().toString());
                 break;
             case R.id.btnSync:
                 syncItems();
@@ -155,36 +111,93 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
     }
 
     private void syncItems() {
+        if (devicesFromServer != null) {
+            deleteAllFromPhone();
+            insertAllToPhone();
+            if (devicesFromPhone.isEmpty()) {
+                devicesFromPhone = sqLiteConnect.getAllItemsFromSQLite();
+                usersFromPhone = sqLiteConnect.getAllUsersFromSQLite();
+            }else{
+                Toast.makeText(getContext(), "NEED DELETE", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            saveDateSync();
 
+
+            showDateOfLastSync();
+            showCountResponseFromPhone();
+            showCountResponseFromServer();
+        } else {
+            Toast.makeText(getContext(), "Server is unavailable ", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
-    //===================================================
+    //===================== Phone methods ================================
+    private void insertAllToPhone() {
+        SQLiteConnect.getInstance(getContext().getApplicationContext()).insertAllItemToSQList(devicesFromServer);
+        SQLiteConnect.getInstance(getContext().getApplicationContext()).insertAllUsersToSQList(usersFromServer);
+    }
 
-    private List<Device> getAllItemsFromMySQL(){
+    private void deleteAllFromPhone() {
+        if (SQLiteConnect.getInstance(getContext()).getNoSyncItemsFromSQLite().isEmpty()) {
+            int result = SQLiteConnect.getInstance(getContext()).deleteALL();
+            Toast.makeText(getContext(), result + " rows was deleted", Toast.LENGTH_LONG).show();
+            devicesFromPhone.clear();
+            usersFromPhone.clear();
+            Log.d(Values.TAG_LOG, "deleteAllFromSQLite: result " + result);
+        } else {
+            tvSyncStatus.setText("SYNC LIST in NOT EMPTY \n Please load items to server");
+        }
+    }
+
+    //===================== Server methods ===============================
+
+    private List<Device> getAllItemsFromMySQL() {
+        Log.d(Values.TAG_LOG, "run getAllItemsFromMySQL");
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Values.server_url,
+                new Response.Listener<JSONObject>() {
+
+                    public void onResponse(JSONObject response) {
+                        devicesFromServer = getArrayDevices(response);
+                        showCountResponseFromServer();
+                        tvConnectStatus.setText("Connected");
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        devicesFromServer = null;
+                        showCountResponseFromServer();
+                        tvConnectStatus.setText("Host is unavailable. \n Check URL or Internet connection ");
+                    }
+                }
+        );
+        MySQLConnect.getInstance(getContext().getApplicationContext()).addToRequestque(jsonObjectRequest);
         return devicesFromServer;
     }
 
     private List<User> getAllUsersFromMySQL() {
+        Log.d(Values.TAG_LOG, "run getAllUsersFromMySQL");
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Values.get_all_users,
+
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        usersFromServer = getArrayUsers(response);
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                       usersFromServer = null;
+                    }
+                }
+        );
+        MySQLConnect.getInstance(getContext().getApplicationContext()).addToRequestque(jsonObjectRequest);
         return usersFromServer;
     }
-
-    private void deleteAllFromSQLite() {
-        if (SQLiteConnect.getInstance(getContext()).getNoSyncItemsFromSQLite().isEmpty()) {
-
-            int result = SQLiteConnect.getInstance(getContext()).deleteALL();
-            Toast.makeText(getContext(), result + " rows was deleted", Toast.LENGTH_LONG).show();
-            devicesFromPhone.clear();
-            usersFromSQLite.clear();
-            showCountRowInSQLite();
-            Log.d(Values.TAG_LOG, "deleteAllFromSQLite: result " + result);
-        } else {
-           // tvInfotmDelete.setTextColor(Color.RED);
-            tvSyncStatus.setText("SYNC LIST in NOT EMPTY \n Please load items to server");
-            Toast.makeText(getContext(), "SYNC LIST in NOT EMPTY", Toast.LENGTH_SHORT).show();
-        }
-    }
-
 
     // ============================= HELPER METHOD =================================================
     private ArrayList<Device> getArrayDevices(JSONObject response) {
@@ -231,54 +244,70 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
         return users;
     }
 
-    private void showCountRowInSQLite() {
+    // ============================= Save and Load Values ==========================================
+
+    public void saveURLHost(String url) {
+        Log.d(Values.TAG_LOG, "run saveUrlHost ||  " + url);
+        sharedPreferences = getActivity().getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor spEdit = sharedPreferences.edit();
+        spEdit.putString("URL", url);
+        spEdit.commit();
+        Values.host=url;
+    }
+
+    public void loadURLHost() {
+        sharedPreferences = getActivity().getPreferences(MODE_PRIVATE);
+        Values.host = sharedPreferences.getString("URL", "");
+        Values.concatUrl(Values.host);
+    }
+
+    public void loadDateSync(){
+        sharedPreferences = getActivity().getPreferences(MODE_PRIVATE);
+        Values.lastSyncDate = sharedPreferences.getString("SyncDate", "");
+    }
+
+    public void saveDateSync() {
+        Date date = new Date();
+        Log.d(Values.TAG_LOG, "run saveDateSync ||  "+date.toString());
+        sharedPreferences = getActivity().getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor spEditDate = sharedPreferences.edit();
+        spEditDate.putString("SyncDate", date.toString());
+        spEditDate.commit();
+        Values.lastSyncDate = date.toString();
+    }
+
+    //============================== Show Values ===================================================
+    private void showAllInfo(){
+     showCountResponseFromServer();
+     showCountResponseFromPhone();
+     showDateOfLastSync();
+    }
+
+    private void showCountResponseFromPhone() {
         if (devicesFromPhone.isEmpty()) {
-            tvDevicesPhone.setText(String.valueOf(devicesFromPhone.size()));
-         //   btnInsertToSQLite.setVisibility(View.VISIBLE);
+            tvDevicesRowInSQLite.setText(String.valueOf(devicesFromPhone.size()));
         } else {
-            tvDevicesPhone.setText(String.valueOf(devicesFromPhone.size()));
-          //  btnInsertToSQLite.setVisibility(View.INVISIBLE);
+            tvDevicesRowInSQLite.setText(String.valueOf(devicesFromPhone.size()));
+            //  btnInsertToSQLite.setVisibility(View.INVISIBLE);
         }
-        tvUsersRowInSQLite.setText(String.valueOf(usersFromSQLite.size()));
-
+        tvUsersRowInSQLite.setText(String.valueOf(usersFromPhone.size()));
     }
 
-    private void showCountRowInMYSQL() {
+    private void showCountResponseFromServer() {
         if (getAllItemsFromMySQL() != null) {
-            tvDeviceServer.setText(String.valueOf(devicesFromServer.size()));
-        }else {
-            tvDeviceServer.setText("-NULL");
+            tvDevicesRowInMYSQL.setText(String.valueOf(devicesFromServer.size()));
+        } else {
+            tvDevicesRowInMYSQL.setText("-NULL");
         }
-        if(getAllUsersFromMySQL() !=null){
-            tvUsersServer.setText(String.valueOf(usersFromServer.size()));
-        }else {
-           tvUsersServer.setText("-NULL");
+        if (getAllUsersFromMySQL() != null) {
+            tvUsersRowInMYSQL.setText(String.valueOf(usersFromServer.size()));
+        } else {
+            tvUsersRowInMYSQL.setText("-NULL");
         }
     }
 
-    private void showCountRowSYNC() {
-
+    private void showDateOfLastSync() {
         tvSyncStatus.setText(Values.lastSyncDate);
-
     }
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
 
-        void saveURLHost(String url);
-
-        void loadURLHost();
-
-        void saveDateSync();
-    }
 }

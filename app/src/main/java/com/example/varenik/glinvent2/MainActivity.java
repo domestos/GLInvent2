@@ -20,7 +20,6 @@ import com.example.varenik.glinvent2.model.Values;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements
-                        ManageFragment.OnFragmentInteractionListener,
                         ScanFragment.OnFragmentInteractionListener {
 
     private TextView mTextMessage;
@@ -30,8 +29,6 @@ public class MainActivity extends AppCompatActivity implements
    private ManageFragment  manageFragment;
    private ScanFragment scanFragment;
    private SyncFragment syncFragment;
-
-   private SharedPreferences sharedPreferences;
 
 
     @Override
@@ -94,34 +91,4 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    @Override
-    public void saveURLHost(String url) {
-        Log.d(Values.TAG_LOG, "Main Activity: run saveUrlHost ||  " + url);
-        sharedPreferences = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor spEdit = sharedPreferences.edit();
-        spEdit.putString("URL", url);
-        spEdit.commit();
-    }
-
-    @Override
-    public void loadURLHost() {
-        sharedPreferences = getPreferences(MODE_PRIVATE);
-        Values.host = sharedPreferences.getString("URL", "");
-        Values.concatUrl(Values.host);
-        // load last sync date
-        Values.lastSyncDate = sharedPreferences.getString("SyncDate", "");
-
-    }
-
-    @Override
-    public void saveDateSync() {
-        Date date = new Date();
-        Log.d(Values.TAG_LOG, "Main Activity: run saveDateSync ||  "+date.toString() );
-
-        sharedPreferences = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor spEditDate = sharedPreferences.edit();
-        spEditDate.putString("SyncDate", date.toString());
-        spEditDate.commit();
-        Values.lastSyncDate = date.toString();
-    }
 }
