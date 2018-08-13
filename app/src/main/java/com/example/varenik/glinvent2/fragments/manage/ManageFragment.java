@@ -1,6 +1,7 @@
 package com.example.varenik.glinvent2.fragments.manage;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -56,13 +57,13 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
         super.onCreate(savedInstanceState);
         loadAllValues();
     }
+
     private void loadAllValues() {
         loadURLHost();
         loadDateSync();
-        // get ALL Items and Users from MYSQL
-        mySQLConnect = MySQLConnect.getInstance(getContext());
-        devicesFromServer = getAllItemsFromMySQL();
-        usersFromServer = getAllUsersFromMySQL();
+        // init MYSQLConnect (single values
+        // )
+            mySQLConnect = MySQLConnect.getInstance(getContext());
         // get ALL Items from SQLite
         sqLiteConnect = SQLiteConnect.getInstance(getContext());
         devicesFromPhone = sqLiteConnect.getAllItemsFromSQLite();
@@ -103,6 +104,9 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
         switch (view.getId()) {
             case R.id.btnSaveUrl:
                 saveURLHost(etServerUrl.getText().toString());
+                loadDateSync();
+                loadURLHost();
+                showAllInfo();
                 break;
             case R.id.btnSync:
                 syncItems();
@@ -122,8 +126,6 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
                 return;
             }
             saveDateSync();
-
-
             showDateOfLastSync();
             showCountResponseFromPhone();
             showCountResponseFromServer();
@@ -131,7 +133,6 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
             Toast.makeText(getContext(), "Server is unavailable ", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     //===================== Phone methods ================================
     private void insertAllToPhone() {
@@ -159,17 +160,20 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
                 new Response.Listener<JSONObject>() {
 
                     public void onResponse(JSONObject response) {
-                        devicesFromServer = getArrayDevices(response);
-                        showCountResponseFromServer();
                         tvConnectStatus.setText("Connected");
+                        tvConnectStatus.setTextColor(Color.GREEN);
+                        if((devicesFromServer = getArrayDevices(response) ) != null){
+                            tvDevicesRowInMYSQL.setText(String.valueOf(devicesFromServer.size()));
+                        }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         devicesFromServer = null;
-                        showCountResponseFromServer();
+                        tvDevicesRowInMYSQL.setText("-NULL");
                         tvConnectStatus.setText("Host is unavailable. \n Check URL or Internet connection ");
+                        tvConnectStatus.setTextColor(Color.RED);
                     }
                 }
         );
@@ -180,21 +184,25 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
     private List<User> getAllUsersFromMySQL() {
         Log.d(Values.TAG_LOG, "run getAllUsersFromMySQL");
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Values.get_all_users,
-
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        usersFromServer = getArrayUsers(response);
-
+                        if( (usersFromServer = getArrayUsers(response) ) !=null){
+                            tvUsersRowInMYSQL.setText(String.valueOf(usersFromServer.size()));
+                        }else{
+                            tvDevicesRowInMYSQL.setText("null");
+                        }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                        usersFromServer = null;
+                       tvUsersRowInMYSQL.setText("-NULL");
                     }
                 }
         );
+
         MySQLConnect.getInstance(getContext().getApplicationContext()).addToRequestque(jsonObjectRequest);
         return usersFromServer;
     }
@@ -282,7 +290,8 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
      showCountResponseFromPhone();
      showDateOfLastSync();
     }
-
+    /**
+     * this method take the values that was get earlier with method initIAll() and show counts of items into database SQLite  */
     private void showCountResponseFromPhone() {
         if (devicesFromPhone.isEmpty()) {
             tvDevicesRowInSQLite.setText(String.valueOf(devicesFromPhone.size()));
@@ -293,6 +302,8 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
         tvUsersRowInSQLite.setText(String.valueOf(usersFromPhone.size()));
     }
 
+    /**
+     * this method make request to the server and show counts of items into database MySQL*/
     private void showCountResponseFromServer() {
         if (getAllItemsFromMySQL() != null) {
             tvDevicesRowInMYSQL.setText(String.valueOf(devicesFromServer.size()));

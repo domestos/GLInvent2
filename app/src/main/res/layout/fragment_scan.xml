@@ -44,12 +44,23 @@
         android:orientation="horizontal">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/list"
+            android:id="@+id/container_recyclerview_scan"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:scrollbars="vertical"
-            tools:listitem="@layout/item" />
+            tools:listitem="@layout/item"
+            >
+
+        </android.support.v7.widget.RecyclerView>
+
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/list"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:scrollbars="vertical"-->
+            <!--tools:listitem="@layout/item" />-->
     </LinearLayout>
 
     <LinearLayout

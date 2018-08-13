@@ -1,54 +1,53 @@
 package com.example.varenik.glinvent2.fragments.scan;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.varenik.glinvent2.R;
+import com.example.varenik.glinvent2.database.sqlite.SQLiteConnect;
+import com.example.varenik.glinvent2.fragments.RecyclerViewAdapter;
+import com.example.varenik.glinvent2.model.Device;
+import com.example.varenik.glinvent2.model.Values;
+import com.google.zxing.integration.android.IntentIntegrator;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ScanFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ScanFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class ScanFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import java.util.List;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+import at.markushi.ui.CircleButton;
 
+import static android.content.ContentValues.TAG;
+
+
+public class ScanFragment extends Fragment implements View.OnClickListener {
+    private EditText etNumber;
+    private CircleButton btnScan;
+    private Button btnSearch;
+    private List<Device> devices;
+    private RecyclerView myrecyclerview;
     private OnFragmentInteractionListener mListener;
 
     public ScanFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ScanFragment.
-     */
+
     // TODO: Rename and change types and number of parameters
     public static ScanFragment newInstance(String param1, String param2) {
         ScanFragment fragment = new ScanFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -57,16 +56,28 @@ public class ScanFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+       //     mParam1 = getArguments().getString(ARG_PARAM1);
+       //     mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_scan, container, false);
+        View view = inflater.inflate(R.layout.fragment_scan, container, false);
+
+        myrecyclerview = view.findViewById(R.id.container_recyclerview_scan);
+        myrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        btnScan = view.findViewById(R.id.btnScan);
+        btnScan.setOnClickListener(this);
+
+        etNumber = view.findViewById(R.id.etNumber);
+        btnSearch = view.findViewById(R.id.btnSearch);
+        btnSearch.setOnClickListener(this);
+
+
+        return  view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -93,16 +104,50 @@ public class ScanFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnScan:
+                IntentIntegrator integrator = new IntentIntegrator(this.getActivity()) {
+                    @Override
+                    protected void startActivityForResult(Intent integrator, int code) {
+                        ScanFragment.this.startActivityForResult(integrator, 312); // REQUEST_CODE override
+                    }
+                };
+                integrator.initiateScan();
+                break;
+            case R.id.btnSearch:
+                findDevices(etNumber.getText().toString());
+                break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data != null) {
+            Log.d(Values.TAG_LOG, "onActivityResult: Fragment  requestCode =" + requestCode + " resulte " + data.getStringExtra("SCAN_RESULT"));
+            etNumber.setText(data.getStringExtra("SCAN_RESULT"));
+            findDevices(data.getStringExtra("SCAN_RESULT"));
+        } else {
+            Toast.makeText(getContext(), "Canceled", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private void findDevices(String etNumber) {
+        Log.d(Values.TAG_LOG, "run findDevices");
+        devices = SQLiteConnect.getInstance(getContext()).getDevicesFromSQLite(etNumber);
+        if (devices != null) {
+            Toast.makeText(getContext(),"find "+ devices.size()+ " items ", Toast.LENGTH_LONG).show();
+            Log.d(Values.TAG_LOG, "find: "+devices.size());
+
+            myrecyclerview.setAdapter(new RecyclerViewAdapter((Context) mListener, devices));
+        } else {
+            Toast.makeText(getContext(), "No find", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
