@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements
          * init all Fragment
          */
         initFtagment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.container, scanFragment).commit();
     }
 
 
