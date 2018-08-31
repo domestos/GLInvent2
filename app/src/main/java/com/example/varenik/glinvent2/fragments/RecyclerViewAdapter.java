@@ -20,8 +20,8 @@ import com.example.varenik.glinvent2.model.Values;
 
 import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
-
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> implements View.OnClickListener {
+    MyViewHolder myViewHolder;
     Context mContext;
     List<Device> mData;
     Dialog myDialog;
@@ -38,13 +38,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         Log.d(Values.TAG_LOG, "run onCreateViewHolder");
         View view;
+
         view = LayoutInflater.from(mContext).inflate(R.layout.item, viewGroup, false);
-        return new MyViewHolder(view);
+
+        myViewHolder = new MyViewHolder(view);
+        myViewHolder.item.setOnClickListener(this);
+
+        return myViewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
            Log.d(Values.TAG_LOG, "run onBindViewHolder" + mData.get(i).getNumber() );
+
 
            if(!Values.sw_inventory_off_on){
                myViewHolder.ll_inventory.setVisibility(View.GONE);
@@ -56,11 +62,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
            myViewHolder.txNumber.setText(mData.get(i).getNumber());
            myViewHolder.txLocation.setText(mData.get(i).getLocation());
            myViewHolder.txOwner.setText(mData.get(i).getOwner());
+
+
+
     }
 
     @Override
     public int getItemCount() {
         return mData.size();
+    }
+
+    @Override
+    public void onClick(View v) {
+        Log.d(Values.TAG_LOG, "run onClick: select item: " + myViewHolder.getAdapterPosition());
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{

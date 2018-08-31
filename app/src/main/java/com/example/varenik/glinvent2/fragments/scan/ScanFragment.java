@@ -45,7 +45,6 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
         // Required empty public constructor
     }
 
-
     // TODO: Rename and change types and number of parameters
     public static ScanFragment newInstance(String param1, String param2) {
         ScanFragment fragment = new ScanFragment();
@@ -110,6 +109,21 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
     }
 
     @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if(swInventoryBtn.isChecked()){
+            //on
+            Values.sw_inventory_off_on = true;
+        }else {
+            //on
+            Values.sw_inventory_off_on = false;
+        }
+
+        if(!etNumber.getText().toString().isEmpty()){
+            findDevices(etNumber.getText().toString());
+        }
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnScan:
@@ -138,7 +152,6 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
         }
     }
 
-
     private void findDevices(String etNumber) {
         Log.d(Values.TAG_LOG, "run findDevices");
         devices = SQLiteConnect.getInstance(getContext()).getDevicesFromSQLite(etNumber);
@@ -151,23 +164,6 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
             Toast.makeText(getContext(), "No find", Toast.LENGTH_LONG).show();
         }
     }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if(swInventoryBtn.isChecked()){
-            //on
-            Values.sw_inventory_off_on = true;
-        }else {
-            //on
-            Values.sw_inventory_off_on = false;
-        }
-
-        if(!etNumber.getText().toString().isEmpty()){
-            findDevices(etNumber.getText().toString());
-        }
-    }
-
-
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
