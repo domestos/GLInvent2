@@ -46,6 +46,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
            Log.d(Values.TAG_LOG, "run onBindViewHolder" + mData.get(i).getNumber() );
 
+           if(!Values.sw_inventory_off_on){
+               myViewHolder.ll_inventory.setVisibility(View.GONE);
+           }else {
+               myViewHolder.ll_inventory.setVisibility(View.VISIBLE);
+           }
+
            myViewHolder.txItem.setText(mData.get(i).getItem());
            myViewHolder.txNumber.setText(mData.get(i).getNumber());
            myViewHolder.txLocation.setText(mData.get(i).getLocation());
@@ -65,9 +71,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
        private TextView txLocation;
        private TextView txOwner;
        private LinearLayout item;
+       private LinearLayout ll_inventory;
+
+
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
+
+        ll_inventory = itemView.findViewById(R.id.ll_inventory);
         item = itemView.findViewById(R.id.item_id);
         txItem = itemView.findViewById(R.id.tx_item);
         txNumber = itemView.findViewById(R.id.tx_number);

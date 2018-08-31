@@ -16,7 +16,7 @@ public class Values extends Application{
     public static final int STATUS_SYNC_OFFLINE = 1;
     public static final String STATUS_FINED= "ok";
     public static String lastSyncDate = "none";
-
+    public static boolean sw_inventory_off_on = false;
 
     public static void concatUrl(String url_host) {
         server_url = "http://"+url_host+"/PHPScript/db_get_all.php";

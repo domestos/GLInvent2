@@ -13,7 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.varenik.glinvent2.R;
@@ -30,10 +32,11 @@ import at.markushi.ui.CircleButton;
 import static android.content.ContentValues.TAG;
 
 
-public class ScanFragment extends Fragment implements View.OnClickListener {
+public class ScanFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
     private EditText etNumber;
     private CircleButton btnScan;
     private Button btnSearch;
+    private Switch swInventoryBtn;
     private List<Device> devices;
     private RecyclerView myrecyclerview;
     private OnFragmentInteractionListener mListener;
@@ -76,6 +79,8 @@ public class ScanFragment extends Fragment implements View.OnClickListener {
         btnSearch = view.findViewById(R.id.btnSearch);
         btnSearch.setOnClickListener(this);
 
+        swInventoryBtn = view.findViewById(R.id.sw_invntory_btn);
+        swInventoryBtn.setOnCheckedChangeListener(this);
 
         return  view;
     }
@@ -146,6 +151,22 @@ public class ScanFragment extends Fragment implements View.OnClickListener {
             Toast.makeText(getContext(), "No find", Toast.LENGTH_LONG).show();
         }
     }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if(swInventoryBtn.isChecked()){
+            //on
+            Values.sw_inventory_off_on = true;
+        }else {
+            //on
+            Values.sw_inventory_off_on = false;
+        }
+
+        if(!etNumber.getText().toString().isEmpty()){
+            findDevices(etNumber.getText().toString());
+        }
+    }
+
 
 
     public interface OnFragmentInteractionListener {
