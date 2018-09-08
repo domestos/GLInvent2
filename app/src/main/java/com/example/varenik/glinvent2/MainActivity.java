@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements
    private ManageFragment  manageFragment;
    private ScanFragment scanFragment;
    private SyncFragment syncFragment;
+   private SharedPreferences sharedPreferences;
 
 
     @Override
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements
         /**
          * init all Fragment
          */
+        loadURLHost();
         initFtagment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.container, scanFragment).commit();
@@ -53,6 +55,12 @@ public class MainActivity extends AppCompatActivity implements
         syncFragment = new SyncFragment();
 
 
+    }
+
+    public void loadURLHost() {
+        sharedPreferences = this.getPreferences(MODE_PRIVATE);
+        Values.host = sharedPreferences.getString("URL", "");
+        Values.concatUrl(Values.host);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener

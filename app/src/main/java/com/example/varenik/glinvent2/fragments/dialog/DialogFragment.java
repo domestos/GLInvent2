@@ -14,7 +14,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,13 +45,14 @@ import static android.widget.Toast.LENGTH_LONG;
 
 public class DialogFragment extends android.support.v4.app.DialogFragment implements View.OnClickListener {
     private ArrayAdapter<String> adapterUsers;
+    private ProgressBar progressBar;
     private String[] arrayLocation;
     private String[] arrayUsers;
     private List<User> allUsers;
     private ListView listSearchUser;
     private Spinner spLocation;
 
-
+    private LinearLayout infoError;
     private Button btnCancel, btnSave;
     private Device device;
     private TextView txNumber, txItem;
@@ -70,6 +73,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         allUsers = getAllUsers();
         arrayLocation = getAllLocation();
 
+
     }
 
     @Nullable
@@ -78,7 +82,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         View view = inflater.inflate(R.layout.dialog_item, container, false);
         Log.d(Values.TAG_LOG, "run onCreateView on DialogFragment");
         initAllViewElements(view);
-
+        showProgress(false);
         return view;
     }
 
@@ -96,7 +100,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
                 device.setDescription(edDescription.getText().toString());
                 editItem(device);
                 //save values
-                getDialog().dismiss();
+                //getDialog().dismiss();
                 break;
         }
 
@@ -111,10 +115,10 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         listSearchUser = view.findViewById(R.id.listSearchUsers);
         txNumber = view.findViewById(R.id.tx_dialog_number);
         txItem = view.findViewById(R.id.tx_dialog_item);
-
+        progressBar = view.findViewById(R.id.progressBar);
         edOwner = view.findViewById(R.id.ed_dialog_owner);
         edDescription = view.findViewById(R.id.ed_dialog_description);
-
+        infoError = view.findViewById(R.id.id_error_info);
         //will NEED refactoring
         if (device != null) {
             Log.d(Values.TAG_LOG, device.getNumber());
@@ -149,6 +153,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 device.setLocation(adapterView.getSelectedItem().toString());
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
@@ -254,26 +259,29 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
 
     private void editItem(final Device mDevice) {
         if (mDevice != null) {
-
+            showProgress(true);
             StringRequest stringRequest = new StringRequest(Request.Method.POST, Values.update_item,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Toast.makeText(getActivity(), response.toString(), LENGTH_LONG).show();
                             int responseSuccess = getSuccess(response);
                             if (responseSuccess != 0) {
                                 // inset to SQLite SATATUS_ONLINE
                                 SQLiteConnect.getInstance(getContext()).updateItem(mDevice, Values.STATUS_SYNC_ONLINE);
                             }
 
+                      //      Toast.makeText(getActivity(), response.toString(), LENGTH_LONG).show();
+                            showProgress(false);
+                            getDialog().dismiss();
                         }
                     },
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(getActivity(), "MYSQL ERROR " + error.getMessage(), LENGTH_LONG).show();
                             SQLiteConnect.getInstance(getContext()).updateItem(mDevice, Values.STATUS_SYNC_OFFLINE);
-
+                            infoError.setVisibility(View.VISIBLE);
+                            Toast.makeText(getContext(), "MYSQL ERROR " + error.getMessage(), LENGTH_LONG).show();
+                            showProgress(false);
                         }
                     }
             ) {
@@ -292,6 +300,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         }
 
     }
+
     private int getSuccess(String response) {
         JSONObject jsonObject = null;
         try {
@@ -305,5 +314,8 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         return 0;
     }
 
-
+    public void showProgress(boolean show) {
+        btnSave.setEnabled(!show);
+        progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
 }

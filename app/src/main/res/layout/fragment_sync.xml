@@ -6,6 +6,12 @@
     android:layout_height="match_parent"
     >
 
+    <Button
+        android:id="@+id/btn_save_to_server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save to Server" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/container_recyclerview"
         android:layout_width="match_parent"

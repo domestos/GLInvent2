@@ -49,6 +49,7 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
 
     public ManageFragment() {
         // Required empty public constructor
+
     }
 
 
@@ -59,7 +60,7 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
     }
 
     private void loadAllValues() {
-        loadURLHost();
+      //  loadURLHost();
         loadDateSync();
         // init MYSQLConnect (single values
         // )
@@ -115,6 +116,8 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
     }
 
     private void syncItems() {
+
+
         if (devicesFromServer != null) {
             deleteAllFromPhone();
             insertAllToPhone();

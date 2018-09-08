@@ -1,6 +1,7 @@
 package com.example.varenik.glinvent2.model;
 
 import android.app.Application;
+import android.util.Log;
 
 public class Values extends Application{
 
@@ -19,6 +20,7 @@ public class Values extends Application{
     public static boolean sw_inventory_off_on = false;
 
     public static void concatUrl(String url_host) {
+        Log.d(TAG_LOG, "concatUrl: host = "+url_host );
         server_url = "http://"+url_host+"/PHPScript/db_get_all.php";
         update_status_invent_url ="http://"+url_host+"/PHPScript/db_update_status.php";
         update_item="http://"+url_host+"/PHPScript/db_update.php";
