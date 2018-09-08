@@ -140,7 +140,7 @@ public class SQLiteConnect {
         users = wrapperUsers(cursor);
         cursor.close();
         if (users != null) {
-            Log.d(Values.TAG_LOG, "result: Users into SQLite =" + users.size());
+          //  Log.d(Values.TAG_LOG, "result: Users into SQLite =" + users.size());
         } else {
             Log.d(Values.TAG_LOG, "result:   Users into SQLite is NULL");
         }
@@ -177,6 +177,19 @@ public class SQLiteConnect {
         cursor.close();
         return device;
     }
+
+    // ================= getAllLocationFromSQLite =========================================================
+    public String[] getAllLocationFromSQLite() {
+        Log.d(Values.TAG_LOG, "SQLiteConnect getAllLocationFromSQLite");
+        String[] columns = new String[] { DBHelper.KEY_LOCATION };
+        String groupBy = DBHelper.KEY_LOCATION ;
+        String orderBy = DBHelper.KEY_LOCATION ;
+        Cursor cursor = sqLiteDatabase.query(DBHelper.TABLE_INVENTORY, columns, null, null, groupBy, null, orderBy);
+        String[] locations = wrapperLocation(cursor);
+        cursor.close();
+        return locations;
+    }
+
 
     // ================= getDevicesFromSQLite =========================================================
     public List<Device> getDevicesFromSQLite(String number) {
@@ -249,6 +262,24 @@ public class SQLiteConnect {
         return devices;
     }
 
+    private String[] wrapperLocation(Cursor cursor) {
+        String[] locations = new String[cursor.getCount()];
+        if (cursor.moveToFirst()) {
+               Integer i=0;
+            for (cursor.isFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+
+                locations[i] = cursor.getString(cursor.getColumnIndex(DBHelper.KEY_LOCATION));
+                Log.d(Values.TAG_LOG, "wrapperLocation:  " + cursor.getString(cursor.getColumnIndex(DBHelper.KEY_LOCATION)));
+                i++;
+            }
+        } else {
+            Log.d(Values.TAG_LOG, "Location into SQLite= " + String.valueOf(cursor.getCount()));
+        }
+
+
+        return locations;
+    }
+
     private List<User> wrapperUsers(Cursor cursor) {
         List<User> users= new ArrayList<User>();
         if (cursor.moveToFirst()) {
@@ -267,4 +298,5 @@ public class SQLiteConnect {
                sqLiteDatabase.delete(DBHelper.TABLE_USERS,null, null);
         return sqLiteDatabase.delete(DBHelper.TABLE_INVENTORY, null, null);
     }
+
 }

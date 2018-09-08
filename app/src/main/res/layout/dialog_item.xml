@@ -2,17 +2,17 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:layout_gravity="center"
-    android:orientation="vertical"
- >
+    android:orientation="vertical">
 
     <LinearLayout
-        android:minWidth="300dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_alignParentTop="true"
+        android:minWidth="520dp"
+
         android:orientation="vertical"
         android:padding="10dp">
 
@@ -32,23 +32,74 @@
             android:gravity="center"
             android:text="Item name" />
 
-        <EditText
-            android:id="@+id/ed_dialog_location"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_locatin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="location" />
+           >
 
-        <EditText
-            android:id="@+id/ed_dialog_owner"
+            <!--<EditText-->
+                <!--android:id="@+id/ed_dialog_location"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--android:hint="Location:"-->
+                <!--android:text="location" />-->
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:hint="Location:"  android:textSize="12dp" />
+
+            <Spinner
+                android:hint="Location:"
+                android:id="@+id/spLocation"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+ />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_owner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Owner" />
+            android:layout_height="wrap_content">
+
+            <EditText
+
+                android:id="@+id/ed_dialog_owner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Owner:"
+                android:text="Owner" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <ListView
+
+            android:id="@+id/listSearchUsers"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="2dp"
+            android:background="#e4e4fd"
+            android:scrollbars="horizontal"
+            android:visibility="gone">
+
+        </ListView>
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_layout_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
         <EditText
             android:id="@+id/ed_dialog_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Description" />
+            android:text="Description"
+            android:hint="Description:" />
+
+        </android.support.design.widget.TextInputLayout>
 
 
     </LinearLayout>
