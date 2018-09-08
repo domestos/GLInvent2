@@ -17,15 +17,29 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.example.varenik.glinvent2.R;
+import com.example.varenik.glinvent2.database.mysql.MySQLConnect;
 import com.example.varenik.glinvent2.database.sqlite.SQLiteConnect;
 import com.example.varenik.glinvent2.model.Device;
 import com.example.varenik.glinvent2.model.User;
 import com.example.varenik.glinvent2.model.Values;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static android.widget.Toast.LENGTH_LONG;
 
 public class DialogFragment extends android.support.v4.app.DialogFragment implements View.OnClickListener {
     private ArrayAdapter<String> adapterUsers;
@@ -78,6 +92,9 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
                 break;
             case (R.id.btn_save):
                 Log.d(Values.TAG_LOG, "onClick: save values from dialog");
+                device.setOwner(edOwner.getText().toString());
+                device.setDescription(edDescription.getText().toString());
+                editItem(device);
                 //save values
                 getDialog().dismiss();
                 break;
@@ -113,7 +130,6 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         viewEditTextLocation(view);
         viewEditTextUser(view);
 
-
         btnCancel = view.findViewById(R.id.btn_cancel);
         btnCancel.setOnClickListener(this);
 
@@ -123,22 +139,16 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
     }
 
     private void viewEditTextLocation(View view) {
-
-
         spLocation = (Spinner) view.findViewById(R.id.spLocation);
         ArrayAdapter<String> adapterLocations = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, arrayLocation);
         adapterLocations.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         spLocation.setAdapter(adapterLocations);
-
         setSelectItem(spLocation, device);
-
         spLocation.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                //  Toast.makeText(getContext(), adapterView.getSelectedItem().toString(), Toast.LENGTH_LONG).show();
                 device.setLocation(adapterView.getSelectedItem().toString());
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
@@ -151,23 +161,18 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
     private void setSelectItem(Spinner spinner, Device mDevice) {
         Log.d("TAG_location", "select Item");
         mDevice.getLocation();
-
         int i = 0;
         String localtion;
         String chek;
         while (arrayLocation.length > i) {
             localtion = mDevice.getLocation();
             chek = arrayLocation[i];
-
             if (localtion.equals(chek)) {
                 spinner.setSelection(i);
-
             }
-            //     Log.d("TAG_location", localtion + " = " + arrayLocation[i]);
             i++;
         }
     }
-
 
     private void viewEditTextUser(View view) {
 
@@ -245,6 +250,59 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
     public String[] getAllLocation() {
         arrayLocation = SQLiteConnect.getInstance(getContext()).getAllLocationFromSQLite();
         return arrayLocation;
+    }
+
+    private void editItem(final Device mDevice) {
+        if (mDevice != null) {
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, Values.update_item,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Toast.makeText(getActivity(), response.toString(), LENGTH_LONG).show();
+                            int responseSuccess = getSuccess(response);
+                            if (responseSuccess != 0) {
+                                // inset to SQLite SATATUS_ONLINE
+                                SQLiteConnect.getInstance(getContext()).updateItem(mDevice, Values.STATUS_SYNC_ONLINE);
+                            }
+
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(getActivity(), "MYSQL ERROR " + error.getMessage(), LENGTH_LONG).show();
+                            SQLiteConnect.getInstance(getContext()).updateItem(mDevice, Values.STATUS_SYNC_OFFLINE);
+
+                        }
+                    }
+            ) {
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("id", String.valueOf(mDevice.getId()));
+                    params.put("owner", mDevice.getOwner());
+                    params.put("location", mDevice.getLocation());
+                    params.put("description", mDevice.getDescription());
+                    return params;
+                }
+            };
+
+            MySQLConnect.getInstance(getContext()).addToRequestque(stringRequest);
+        }
+
+    }
+    private int getSuccess(String response) {
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(response);
+            Log.d(Values.TAG_LOG, "getSuccess: " + jsonObject.get("success"));
+            return (Integer) jsonObject.get("success");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 
