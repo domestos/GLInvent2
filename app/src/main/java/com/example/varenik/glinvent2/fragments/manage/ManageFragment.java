@@ -119,7 +119,11 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
 
 
         if (devicesFromServer != null) {
-            deleteAllFromPhone();
+
+            if (!deleteAllFromPhone()){
+                return;
+            }
+
             insertAllToPhone();
             if (devicesFromPhone.isEmpty()) {
                 devicesFromPhone = sqLiteConnect.getAllItemsFromSQLite();
@@ -143,15 +147,22 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
         SQLiteConnect.getInstance(getContext().getApplicationContext()).insertAllUsersToSQList(usersFromServer);
     }
 
-    private void deleteAllFromPhone() {
+    private Boolean deleteAllFromPhone() {
+        Log.d(Values.TAG_LOG, "run deleteAllFromSQLite: ");
         if (SQLiteConnect.getInstance(getContext()).getNoSyncItemsFromSQLite().isEmpty()) {
+            Log.d(Values.TAG_LOG, "getNoSyncItemsFromSQLite()  is EMPTY");
             int result = SQLiteConnect.getInstance(getContext()).deleteALL();
-            Toast.makeText(getContext(), result + " rows was deleted", Toast.LENGTH_LONG).show();
+            Log.d(Values.TAG_LOG, "deleteAllFromSQLite: result " + result);
+
+//            Toast.makeText(getContext(), result + " rows was deleted", Toast.LENGTH_LONG).show();
             devicesFromPhone.clear();
             usersFromPhone.clear();
-            Log.d(Values.TAG_LOG, "deleteAllFromSQLite: result " + result);
-        } else {
+            return true;
+         } else {
+            Log.d(Values.TAG_LOG, "SYNC LIST in NOT EMPTY \n Please load items to server");
             tvSyncStatus.setText("SYNC LIST in NOT EMPTY \n Please load items to server");
+            tvSyncStatus.setTextColor(Color.RED);
+            return false;
         }
     }
 

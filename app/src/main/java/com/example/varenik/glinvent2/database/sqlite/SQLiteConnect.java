@@ -208,13 +208,10 @@ public class SQLiteConnect {
     // ================= getNoSyncItemsFromSQLite ==================================================
     public List<Device> getNoSyncItemsFromSQLite() {
         Log.d(Values.TAG_LOG, "SQLiteConnect getNoSyncItemsFromSQLite");
-        List<Device> devices = new ArrayList<Device>();
-        Device device = null;
         String[] selectArgs = new String[]{String.valueOf(Values.STATUS_SYNC_OFFLINE)};
         String select = DBHelper.KEY_STATUS_SYNC + " = ? ";
         Cursor cursor = sqLiteDatabase.query(DBHelper.TABLE_INVENTORY, null, select, selectArgs, null, null, null);
-        devices = wrapperDevices(cursor);
-        return devices;
+        return wrapperDevices(cursor);
     }
 
     public void updateStatusInvent(int id, int statusSync) {

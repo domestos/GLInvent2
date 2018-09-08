@@ -280,7 +280,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
                         public void onErrorResponse(VolleyError error) {
                             SQLiteConnect.getInstance(getContext()).updateItem(mDevice, Values.STATUS_SYNC_OFFLINE);
                             infoError.setVisibility(View.VISIBLE);
-                            Toast.makeText(getContext(), "MYSQL ERROR " + error.getMessage(), LENGTH_LONG).show();
+                           // Toast.makeText(getContext(), "MYSQL ERROR " + error.getMessage(), LENGTH_LONG).show();
                             showProgress(false);
                         }
                     }
