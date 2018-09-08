@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.example.varenik.glinvent2.R;
 import com.example.varenik.glinvent2.database.sqlite.SQLiteConnect;
 import com.example.varenik.glinvent2.fragments.RecyclerViewAdapter;
+import com.example.varenik.glinvent2.fragments.dialog.DialogFragment;
 import com.example.varenik.glinvent2.model.Device;
 import com.example.varenik.glinvent2.model.Values;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -159,10 +161,16 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
             Toast.makeText(getContext(),"find "+ devices.size()+ " items ", Toast.LENGTH_LONG).show();
             Log.d(Values.TAG_LOG, "find: "+devices.size());
 
-            myrecyclerview.setAdapter(new RecyclerViewAdapter((Context) mListener, devices));
+            myrecyclerview.setAdapter(new RecyclerViewAdapter((Context) mListener, devices, this));
         } else {
             Toast.makeText(getContext(), "No find", Toast.LENGTH_LONG).show();
         }
+    }
+
+
+    public void runDialog(Device device){
+        DialogFragment dialogFragment = new DialogFragment(device);
+        dialogFragment.show(getFragmentManager(), "MySyncFragment");
     }
 
     public interface OnFragmentInteractionListener {

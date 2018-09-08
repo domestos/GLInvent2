@@ -3,6 +3,7 @@ package com.example.varenik.glinvent2.fragments;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.icu.text.UnicodeSetSpanner;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,23 +16,35 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.varenik.glinvent2.R;
+import com.example.varenik.glinvent2.fragments.scan.ScanFragment;
+import com.example.varenik.glinvent2.fragments.sync.SyncFragment;
 import com.example.varenik.glinvent2.model.Device;
 import com.example.varenik.glinvent2.model.Values;
 
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> implements View.OnClickListener {
-    MyViewHolder myViewHolder;
+
     Context mContext;
     List<Device> mData;
     Dialog myDialog;
+    ScanFragment scanFragment;
+    SyncFragment syncFragment;
 
-    public RecyclerViewAdapter(Context mContext, List<Device> mData){
+    public RecyclerViewAdapter(Context mContext, List<Device> mData, ScanFragment scanFragment){
         Log.d(Values.TAG_LOG, "run class.RecyclerViewAdapter");
+        this.scanFragment = scanFragment;
         this.mContext = mContext;
         this.mData = mData;
     }
 
+
+    public RecyclerViewAdapter(Context mContext, List<Device> mData, SyncFragment syncFragment){
+        Log.d(Values.TAG_LOG, "run class.RecyclerViewAdapter");
+        this.syncFragment = syncFragment;
+        this.mContext = mContext;
+        this.mData = mData;
+    }
 
     @NonNull
     @Override
@@ -41,8 +54,25 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         view = LayoutInflater.from(mContext).inflate(R.layout.item, viewGroup, false);
 
-        myViewHolder = new MyViewHolder(view);
-        myViewHolder.item.setOnClickListener(this);
+        final MyViewHolder myViewHolder = new MyViewHolder(view);
+
+
+
+        myViewHolder.item.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mContext, "selected : "+String.valueOf(myViewHolder.getAdapterPosition()+ ""), Toast.LENGTH_LONG).show();
+                Log.d(Values.TAG_LOG, "run onClick: select item: " + myViewHolder.getAdapterPosition());
+
+               if(scanFragment !=null) {
+                   scanFragment.runDialog(mData.get(myViewHolder.getAdapterPosition()));
+               }
+
+               if (syncFragment !=null){
+                    syncFragment.runDialog(mData.get(myViewHolder.getAdapterPosition()));
+                }
+            }
+        });
 
         return myViewHolder;
     }
@@ -74,7 +104,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onClick(View v) {
-        Log.d(Values.TAG_LOG, "run onClick: select item: " + myViewHolder.getAdapterPosition());
+
     }
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{

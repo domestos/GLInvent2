@@ -3,6 +3,7 @@ package com.example.varenik.glinvent2.fragments.sync;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.example.varenik.glinvent2.R;
 import com.example.varenik.glinvent2.fragments.RecyclerViewAdapter;
+import com.example.varenik.glinvent2.fragments.dialog.DialogFragment;
 import com.example.varenik.glinvent2.model.Device;
 
 import java.util.ArrayList;
@@ -34,10 +36,15 @@ public class SyncFragment extends Fragment {
         v =inflater.inflate(R.layout.fragment_sync, container,false);
 
         myrecyclerview = v.findViewById(R.id.container_recyclerview);
-        RecyclerViewAdapter recyclerViewAdapter  =  new RecyclerViewAdapter(getContext(), listDevice);
+        RecyclerViewAdapter recyclerViewAdapter  =  new RecyclerViewAdapter(getContext(), listDevice, this);
         myrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         myrecyclerview.setAdapter(recyclerViewAdapter);
         return v;
+    }
+
+    public void runDialog(Device device){
+        DialogFragment dialogFragment = new DialogFragment(device);
+        dialogFragment.show(getFragmentManager(), "MySyncFragment");
     }
 
     @Override
