@@ -45,10 +45,13 @@
         android:fitsSystemWindows="true"
         android:orientation="horizontal">
 
-        <android.support.v7.widget.RecyclerView
+        <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/container_recyclerview_scan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:scrollbars="vertical"
             tools:listitem="@layout/item"></android.support.v7.widget.RecyclerView>
 

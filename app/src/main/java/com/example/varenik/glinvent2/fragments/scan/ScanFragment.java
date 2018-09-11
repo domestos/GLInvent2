@@ -44,20 +44,24 @@ import java.util.Map;
 
 import at.markushi.ui.CircleButton;
 
+import static com.example.varenik.glinvent2.model.Values.STATUS_FINED;
 import static com.example.varenik.glinvent2.model.Values.STATUS_SYNC_OFFLINE;
 import static com.example.varenik.glinvent2.model.Values.STATUS_SYNC_ONLINE;
 
 
 public class ScanFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
-    private Device device;
-    private ImageView ico_phone, ico_server;
+
+    private View view;
+    private Button btnCheckInvent;
+    private ImageView ic_phone, ic_server;
     private EditText etNumber;
     private CircleButton btnScan;
-    private Button btnSearch, btnCheckInvent;
+    private Button btnSearch;
     private Switch swInventoryBtn;
     private List<Device> devices;
     private RecyclerView myrecyclerview;
     private OnFragmentInteractionListener mListener;
+    private RecyclerViewAdapter recyclerViewAdapter;
 
     public ScanFragment() {
         // Required empty public constructor
@@ -84,19 +88,16 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_scan, container, false);
+        view = inflater.inflate(R.layout.fragment_scan, container, false);
+
 
         myrecyclerview = view.findViewById(R.id.container_recyclerview_scan);
         myrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        ico_phone = view.findViewById(R.id.ic_phone);
-        ico_server = view.findViewById(R.id.ic_server);
+        recyclerViewAdapter = new RecyclerViewAdapter((Context) mListener, devices, this);
+        myrecyclerview.setAdapter(recyclerViewAdapter);
 
         btnScan = view.findViewById(R.id.btnScan);
         btnScan.setOnClickListener(this);
-
-        btnCheckInvent = view.findViewById(R.id.btnCheckInvent);
-        btnCheckInvent.setOnClickListener(this);
 
         etNumber = view.findViewById(R.id.etNumber);
         btnSearch = view.findViewById(R.id.btnSearch);
@@ -104,7 +105,6 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
 
         swInventoryBtn = view.findViewById(R.id.sw_invntory_btn);
         swInventoryBtn.setOnCheckedChangeListener(this);
-
 
         return  view;
     }
@@ -164,14 +164,13 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
                 findDevices(etNumber.getText().toString());
                 break;
 
-            case R.id.btnCheckInvent:
-                    CheckInvent(device);
-                break;
         }
     }
 
-    private void CheckInvent(final Device device) {
+    public void runCheckInvent(final Device device, final int adapterPosition) {
         Log.d(Values.TAG_LOG, "CheckInvent: ");
+       // ic_server = myrecyclerview.findContainingViewHolder(view).itemView.findViewById(R.id.ic_server);
+
         if(device != null) {
             StringRequest  stringRequest = new StringRequest (Request.Method.POST, Values.update_status_invent_url,
                     new Response.Listener<String>() {
@@ -182,10 +181,16 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
                             if(responseSuccess !=0){
                                 // inset to SQLite SATATUS_ONLINE
                                 SQLiteConnect.getInstance(getContext()).updateStatusInvent(device.getId(), STATUS_SYNC_ONLINE);
-//                                tvMySQL.setTextColor(Color.GREEN);
-//                                tvSQLite.setTextColor(Color.GREEN);
+
+                                device.setStatusSync(STATUS_SYNC_ONLINE);
+                                device.setStatusInvent(STATUS_FINED);
+
+                                myrecyclerview.getAdapter().notifyItemChanged(adapterPosition,device);
+                               // ic_server.setColorFilter(Color.GREEN);
+                                //ic_phone.setColorFilter(Color.GREEN);
                                 Toast.makeText(getActivity(),"MYSQL and SQLite are Success ",Toast.LENGTH_LONG).show();
                                 //showProgress(false);
+
                             }
 
                         }
@@ -193,11 +198,18 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(getActivity(),"MYSQL insert ERROR "+error.getMessage(),Toast.LENGTH_LONG).show();
+                            //Toast.makeText(getActivity(),"MYSQL insert ERROR "+error.getMessage(),Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(),"ERROR! \n Server unavailable",Toast.LENGTH_LONG).show();
                             SQLiteConnect.getInstance(getContext()).updateStatusInvent(device.getId(),STATUS_SYNC_OFFLINE);
-                            //tvMySQL.setTextColor(Color.RED);
-                            //tvSQLite.setTextColor(Color.GREEN);
+
+                            device.setStatusSync(STATUS_SYNC_OFFLINE);
+                            device.setStatusInvent(STATUS_FINED);
+
+                            myrecyclerview.getAdapter().notifyItemChanged(adapterPosition,device);
+                           // ic_server.setColorFilter(Color.RED);
+                           // ic_phone.setColorFilter(Color.GREEN);
                             //showProgress(false);
+
                         }
                     }
             ){
@@ -215,6 +227,7 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
             MySQLConnect.getInstance(getContext()).addToRequestque(stringRequest);
 
         }
+
     } //end CheckInvent
 
     @Override
@@ -234,8 +247,9 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
         if (devices != null) {
             //Toast.makeText(getContext(),"find "+ devices.size()+ " items ", Toast.LENGTH_LONG).show();
             Log.d(Values.TAG_LOG, "find: "+devices.size());
-
-            myrecyclerview.setAdapter(new RecyclerViewAdapter((Context) mListener, devices, this));
+            recyclerViewAdapter.setUpdatedListOfDevices(devices);
+            myrecyclerview.getAdapter().notifyDataSetChanged();
+           // myrecyclerview.setAdapter(new RecyclerViewAdapter((Context) mListener, devices, this));
         } else {
             Toast.makeText(getContext(), "No find", Toast.LENGTH_LONG).show();
         }
