@@ -2,6 +2,7 @@ package com.example.varenik.glinvent2.fragments.scan;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -16,10 +17,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.example.varenik.glinvent2.R;
+import com.example.varenik.glinvent2.database.mysql.MySQLConnect;
 import com.example.varenik.glinvent2.database.sqlite.SQLiteConnect;
 import com.example.varenik.glinvent2.fragments.RecyclerViewAdapter;
 import com.example.varenik.glinvent2.fragments.dialog.DialogFragment;
@@ -27,17 +35,25 @@ import com.example.varenik.glinvent2.model.Device;
 import com.example.varenik.glinvent2.model.Values;
 import com.google.zxing.integration.android.IntentIntegrator;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import at.markushi.ui.CircleButton;
 
-import static android.content.ContentValues.TAG;
+import static com.example.varenik.glinvent2.model.Values.STATUS_SYNC_OFFLINE;
+import static com.example.varenik.glinvent2.model.Values.STATUS_SYNC_ONLINE;
 
 
 public class ScanFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+    private Device device;
+    private ImageView ico_phone, ico_server;
     private EditText etNumber;
     private CircleButton btnScan;
-    private Button btnSearch;
+    private Button btnSearch, btnCheckInvent;
     private Switch swInventoryBtn;
     private List<Device> devices;
     private RecyclerView myrecyclerview;
@@ -73,8 +89,14 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
         myrecyclerview = view.findViewById(R.id.container_recyclerview_scan);
         myrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        ico_phone = view.findViewById(R.id.ic_phone);
+        ico_server = view.findViewById(R.id.ic_server);
+
         btnScan = view.findViewById(R.id.btnScan);
         btnScan.setOnClickListener(this);
+
+        btnCheckInvent = view.findViewById(R.id.btnCheckInvent);
+        btnCheckInvent.setOnClickListener(this);
 
         etNumber = view.findViewById(R.id.etNumber);
         btnSearch = view.findViewById(R.id.btnSearch);
@@ -82,6 +104,7 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
 
         swInventoryBtn = view.findViewById(R.id.sw_invntory_btn);
         swInventoryBtn.setOnCheckedChangeListener(this);
+
 
         return  view;
     }
@@ -140,8 +163,59 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
             case R.id.btnSearch:
                 findDevices(etNumber.getText().toString());
                 break;
+
+            case R.id.btnCheckInvent:
+                    CheckInvent(device);
+                break;
         }
     }
+
+    private void CheckInvent(final Device device) {
+        Log.d(Values.TAG_LOG, "CheckInvent: ");
+        if(device != null) {
+            StringRequest  stringRequest = new StringRequest (Request.Method.POST, Values.update_status_invent_url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Toast.makeText(getActivity(),response.toString(),Toast.LENGTH_LONG).show();
+                            int responseSuccess = getSuccess(response);
+                            if(responseSuccess !=0){
+                                // inset to SQLite SATATUS_ONLINE
+                                SQLiteConnect.getInstance(getContext()).updateStatusInvent(device.getId(), STATUS_SYNC_ONLINE);
+//                                tvMySQL.setTextColor(Color.GREEN);
+//                                tvSQLite.setTextColor(Color.GREEN);
+                                Toast.makeText(getActivity(),"MYSQL and SQLite are Success ",Toast.LENGTH_LONG).show();
+                                //showProgress(false);
+                            }
+
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(getActivity(),"MYSQL insert ERROR "+error.getMessage(),Toast.LENGTH_LONG).show();
+                            SQLiteConnect.getInstance(getContext()).updateStatusInvent(device.getId(),STATUS_SYNC_OFFLINE);
+                            //tvMySQL.setTextColor(Color.RED);
+                            //tvSQLite.setTextColor(Color.GREEN);
+                            //showProgress(false);
+                        }
+                    }
+            ){
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params  = new HashMap<String, String>();
+                    Log.d(Values.TAG_LOG, "getParams: id = "+device.getId());
+                    params.put("id", String.valueOf(device.getId()));
+                    params.put("method", "method_fined");
+                    params.put("status_invent", Values.STATUS_FINED);
+                    return params;
+                }
+            };
+
+            MySQLConnect.getInstance(getContext()).addToRequestque(stringRequest);
+
+        }
+    } //end CheckInvent
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -167,11 +241,25 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
         }
     }
 
-
     public void runDialog(Device device){
         DialogFragment dialogFragment = new DialogFragment(device);
         dialogFragment.show(getFragmentManager(), "MySyncFragment");
     }
+
+    /**  HELPER METHODS */
+    private int getSuccess(String response) {
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(response);
+            Log.d(Values.TAG_LOG, "getSuccess: "+ jsonObject.get("success") );
+            return (Integer) jsonObject.get("success") ;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
