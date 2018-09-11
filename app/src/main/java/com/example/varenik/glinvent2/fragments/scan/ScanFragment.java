@@ -158,7 +158,7 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
         Log.d(Values.TAG_LOG, "run findDevices");
         devices = SQLiteConnect.getInstance(getContext()).getDevicesFromSQLite(etNumber);
         if (devices != null) {
-            Toast.makeText(getContext(),"find "+ devices.size()+ " items ", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getContext(),"find "+ devices.size()+ " items ", Toast.LENGTH_LONG).show();
             Log.d(Values.TAG_LOG, "find: "+devices.size());
 
             myrecyclerview.setAdapter(new RecyclerViewAdapter((Context) mListener, devices, this));

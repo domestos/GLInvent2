@@ -30,7 +30,6 @@ import com.example.varenik.glinvent2.model.Values;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +38,11 @@ import static android.content.ContentValues.TAG;
 
 public class SyncFragment extends Fragment {
 
-    View view;
+    private View view;
     private RecyclerView myrecyclerview;
     private List<Device> devices;
     private Button btnSaveToServer;
-    private List<Device> allItemFromSQLite;
+    private RecyclerViewAdapter recyclerViewAdapter;
 
     public SyncFragment() {
 
@@ -62,7 +61,7 @@ public class SyncFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_sync, container, false);
 
         myrecyclerview = view.findViewById(R.id.container_recyclerview);
-        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(), getNoSyncItems(), this);
+        recyclerViewAdapter = new RecyclerViewAdapter(getContext(), getNoSyncItems(), this);
         myrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         myrecyclerview.setAdapter(recyclerViewAdapter);
 
@@ -80,7 +79,6 @@ public class SyncFragment extends Fragment {
         DialogFragment dialogFragment = new DialogFragment(device);
         dialogFragment.show(getFragmentManager(), "MySyncFragment");
     }
-
 
     private List<Device> getNoSyncItems() {
         Log.d(Values.TAG_LOG, "run getNoSyncItems ");
@@ -104,13 +102,11 @@ public class SyncFragment extends Fragment {
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            //   Toast.makeText(getActivity(),device.getNumber()+response.toString(),Toast.LENGTH_SHORT).show();
-
                             int responseSuccess = getSuccess(response);
                             if(responseSuccess !=0){
                                 // inset to SQLite SATATUS_ONLINE
                                 SQLiteConnect.getInstance(getContext()).updateStatusInvent(device.getId(), Values.STATUS_SYNC_ONLINE);
-                          //      myrecyclerview.setDevices(getNoSyncItems());
+                                recyclerViewAdapter.setUpdatedListOfDevices(getNoSyncItems());
                                 adapter.notifyDataSetChanged();
                             }
                         }

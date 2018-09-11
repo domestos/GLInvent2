@@ -38,6 +38,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         this.mData = mData;
     }
 
+    public void setUpdatedListOfDevices(List<Device> mData) {
+        this.mData = mData;
+    }
+
 
     public RecyclerViewAdapter(Context mContext, List<Device> mData, SyncFragment syncFragment){
         Log.d(Values.TAG_LOG, "run class.RecyclerViewAdapter");
@@ -80,21 +84,15 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
            Log.d(Values.TAG_LOG, "run onBindViewHolder" + mData.get(i).getNumber() );
-
-
            if(!Values.sw_inventory_off_on){
                myViewHolder.ll_inventory.setVisibility(View.GONE);
            }else {
                myViewHolder.ll_inventory.setVisibility(View.VISIBLE);
            }
-
            myViewHolder.txItem.setText(mData.get(i).getItem());
            myViewHolder.txNumber.setText(mData.get(i).getNumber());
            myViewHolder.txLocation.setText(mData.get(i).getLocation());
            myViewHolder.txOwner.setText(mData.get(i).getOwner());
-
-
-
     }
 
     @Override
