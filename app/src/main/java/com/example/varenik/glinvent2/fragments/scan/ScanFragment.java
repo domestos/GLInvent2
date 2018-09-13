@@ -49,7 +49,7 @@ import static com.example.varenik.glinvent2.model.Values.STATUS_SYNC_OFFLINE;
 import static com.example.varenik.glinvent2.model.Values.STATUS_SYNC_ONLINE;
 
 
-public class ScanFragment extends Fragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class ScanFragment extends Fragment implements DialogFragment.OnDialogButtonSelected, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private View view;
     private Button btnCheckInvent;
@@ -67,22 +67,22 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
-    public static ScanFragment newInstance(String param1, String param2) {
-        ScanFragment fragment = new ScanFragment();
-        Bundle args = new Bundle();
-
-        fragment.setArguments(args);
-        return fragment;
-    }
+//    // TODO: Rename and change types and number of parameters
+//    public static ScanFragment newInstance(String param1, String param2) {
+//        ScanFragment fragment = new ScanFragment();
+//        Bundle args = new Bundle();
+//
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-       //     mParam1 = getArguments().getString(ARG_PARAM1);
-       //     mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+//        if (getArguments() != null) {
+//       //     mParam1 = getArguments().getString(ARG_PARAM1);
+//       //     mParam2 = getArguments().getString(ARG_PARAM2);
+//        }
     }
 
     @Override
@@ -110,11 +110,11 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+//    public void onButtonPressed(Uri uri) {
+//        if (mListener != null) {
+//            mListener.onFragmentInteraction(uri);
+//        }
+//    }
 
     @Override
     public void onAttach(Context context) {
@@ -260,6 +260,7 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
 
     public void runDialog(Device device){
         DialogFragment dialogFragment = new DialogFragment(device);
+        dialogFragment.setTargetFragment(this, 1);
         dialogFragment.show(getFragmentManager(), "MySyncFragment");
     }
 
@@ -277,9 +278,19 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
         return 0;
     }
 
+    @Override
+    public void dialogRespons(Device device) {
+     //   myrecyclerview.getAdapter().notifyDataSetChanged();
+
+        findDevices(etNumber.getText().toString());
+    }
+
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public class OnScanFragmentInteractionListener {
     }
 }

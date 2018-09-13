@@ -1,6 +1,7 @@
 package com.example.varenik.glinvent2.fragments.dialog;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -57,6 +58,11 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
     private Device device;
     private TextView txNumber, txItem;
     private EditText edLocation, edOwner, edDescription;
+    private OnDialogButtonSelected onDialogButtonSelected;
+
+    public interface OnDialogButtonSelected{
+        void dialogRespons(Device device);
+    }
 
     public DialogFragment() {
     }
@@ -72,9 +78,8 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         super.onCreate(savedInstanceState);
         allUsers = getAllUsers();
         arrayLocation = getAllLocation();
-
-
     }
+
 
     @Nullable
     @Override
@@ -86,6 +91,15 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         return view;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            onDialogButtonSelected = (OnDialogButtonSelected) getTargetFragment();
+        }catch (ClassCastException e){
+            Log.e(Values.TAG_LOG, "onAttach: ClassCastException : " +e.getMessage() );
+        }
+    }
 
     @Override
     public void onClick(View view) {
@@ -99,6 +113,8 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
                 device.setOwner(edOwner.getText().toString());
                 device.setDescription(edDescription.getText().toString());
                 editItem(device);
+//                onDialogButtonSelected.dialogRespons(device);
+
                 //save values
                 //getDialog().dismiss();
                 break;
@@ -269,8 +285,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
                                 // inset to SQLite SATATUS_ONLINE
                                 SQLiteConnect.getInstance(getContext()).updateItem(mDevice, Values.STATUS_SYNC_ONLINE);
                             }
-
-                      //      Toast.makeText(getActivity(), response.toString(), LENGTH_LONG).show();
+                            dialogRespons(mDevice);
                             showProgress(false);
                             getDialog().dismiss();
                         }
@@ -281,6 +296,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
                             SQLiteConnect.getInstance(getContext()).updateItem(mDevice, Values.STATUS_SYNC_OFFLINE);
                             infoError.setVisibility(View.VISIBLE);
                            // Toast.makeText(getContext(), "MYSQL ERROR " + error.getMessage(), LENGTH_LONG).show();
+                            dialogRespons(mDevice);
                             showProgress(false);
                         }
                     }
@@ -299,6 +315,19 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
             MySQLConnect.getInstance(getContext()).addToRequestque(stringRequest);
         }
 
+    }
+
+    private void dialogRespons(Device mDevice) {
+       switch (this.getTargetRequestCode()){
+           //ScanFragment
+           case 1:
+               onDialogButtonSelected.dialogRespons(mDevice);
+               break;
+           //SyncFragment
+           case 2:
+               onDialogButtonSelected.dialogRespons(mDevice);
+               break;
+       }
     }
 
     private int getSuccess(String response) {

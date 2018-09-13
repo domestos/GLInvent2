@@ -15,12 +15,14 @@ import android.widget.TextView;
 import com.example.varenik.glinvent2.fragments.manage.ManageFragment;
 import com.example.varenik.glinvent2.fragments.scan.ScanFragment;
 import com.example.varenik.glinvent2.fragments.sync.SyncFragment;
+import com.example.varenik.glinvent2.fragments.user.UserFragment;
 import com.example.varenik.glinvent2.model.Values;
 
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements
-                        ScanFragment.OnFragmentInteractionListener {
+                        ScanFragment.OnFragmentInteractionListener,
+                        UserFragment.OnScanFragmentInteractionListener{
 
     private TextView mTextMessage;
     /**
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements
    private ManageFragment  manageFragment;
    private ScanFragment scanFragment;
    private SyncFragment syncFragment;
+   private UserFragment userFragment;
    private SharedPreferences sharedPreferences;
 
 
@@ -48,12 +51,11 @@ public class MainActivity extends AppCompatActivity implements
         fragmentTransaction.replace(R.id.container, scanFragment).commit();
     }
 
-
     private void initFtagment() {
         manageFragment = new ManageFragment();
         scanFragment = new ScanFragment();
         syncFragment = new SyncFragment();
-
+        userFragment = new UserFragment();
 
     }
 
@@ -65,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements
                     fragmentTransaction.replace(R.id.container, syncFragment).commit();
                     return true;
                 case R.id.navigation_user:
-
+                    fragmentTransaction.replace(R.id.container, userFragment).commit();
                     return true;
                 case R.id.navigation_manage:
                     fragmentTransaction.replace(R.id.container, manageFragment).commit();
@@ -87,14 +88,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     };
 
-
-
-
     /**
      * Init Methods of Manager Fragment
      *
      */
-
 
     @Override
     public void onFragmentInteraction(Uri uri) {

@@ -36,7 +36,7 @@ import java.util.Map;
 
 import static android.content.ContentValues.TAG;
 
-public class SyncFragment extends Fragment {
+public class SyncFragment extends Fragment implements DialogFragment.OnDialogButtonSelected {
 
     private View view;
     private RecyclerView myrecyclerview;
@@ -77,6 +77,7 @@ public class SyncFragment extends Fragment {
 
     public void runDialog(Device device) {
         DialogFragment dialogFragment = new DialogFragment(device);
+        dialogFragment.setTargetFragment(this, 2);
         dialogFragment.show(getFragmentManager(), "MySyncFragment");
     }
 
@@ -156,4 +157,8 @@ public class SyncFragment extends Fragment {
         return 0;
     }
 
+    @Override
+    public void dialogRespons(Device device){
+        myrecyclerview.getAdapter().notifyDataSetChanged();
+    }
 }
