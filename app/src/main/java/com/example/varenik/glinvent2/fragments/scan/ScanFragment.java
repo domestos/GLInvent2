@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -31,6 +32,7 @@ import com.example.varenik.glinvent2.database.mysql.MySQLConnect;
 import com.example.varenik.glinvent2.database.sqlite.SQLiteConnect;
 import com.example.varenik.glinvent2.fragments.RecyclerViewAdapter;
 import com.example.varenik.glinvent2.fragments.dialog.DialogFragment;
+import com.example.varenik.glinvent2.fragments.dialog.DialogInventSettingFragment;
 import com.example.varenik.glinvent2.model.Device;
 import com.example.varenik.glinvent2.model.Values;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -52,11 +54,10 @@ import static com.example.varenik.glinvent2.model.Values.STATUS_SYNC_ONLINE;
 public class ScanFragment extends Fragment implements DialogFragment.OnDialogButtonSelected, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private View view;
-    private Button btnCheckInvent;
-    private ImageView ic_phone, ic_server;
     private EditText etNumber;
     private CircleButton btnScan;
     private Button btnSearch;
+    private ImageButton btnInventSettings;
     private Switch swInventoryBtn;
     private List<Device> devices;
     private RecyclerView myrecyclerview;
@@ -95,6 +96,9 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
         myrecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerViewAdapter = new RecyclerViewAdapter((Context) mListener, devices, this);
         myrecyclerview.setAdapter(recyclerViewAdapter);
+
+        btnInventSettings  = view.findViewById(R.id.btn_invent_settings);
+        btnInventSettings.setOnClickListener(this);
 
         btnScan = view.findViewById(R.id.btnScan);
         btnScan.setOnClickListener(this);
@@ -138,11 +142,12 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
         if(swInventoryBtn.isChecked()){
             //on
             Values.sw_inventory_off_on = true;
+            btnInventSettings.setVisibility(View.VISIBLE);
         }else {
-            //on
+            //of
             Values.sw_inventory_off_on = false;
+            btnInventSettings.setVisibility(View.GONE);
         }
-
         if(!etNumber.getText().toString().isEmpty()){
             findDevices(etNumber.getText().toString());
         }
@@ -164,6 +169,11 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
                 findDevices(etNumber.getText().toString());
                 break;
 
+            case R.id.btn_invent_settings:
+                DialogInventSettingFragment dialogInventSettingFragment = new DialogInventSettingFragment();
+                dialogInventSettingFragment.show(getFragmentManager(), "DialogInventSettings");
+                break;
+
         }
     }
 
@@ -182,18 +192,10 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
                                 // inset to SQLite SATATUS_ONLINE
                                 SQLiteConnect.getInstance(getContext()).updateSyncStatus(device.getId(), STATUS_SYNC_ONLINE);
                                 SQLiteConnect.getInstance(getContext()).updateStatusInvent(device.getId(), STATUS_SYNC_ONLINE);
-
-
-
                                 device.setStatusSync(STATUS_SYNC_ONLINE);
                                 device.setStatusInvent(STATUS_FINED);
-
                                 myrecyclerview.getAdapter().notifyItemChanged(adapterPosition,device);
-                               // ic_server.setColorFilter(Color.GREEN);
-                                //ic_phone.setColorFilter(Color.GREEN);
                                 Toast.makeText(getActivity(),"MYSQL and SQLite are Success ",Toast.LENGTH_LONG).show();
-                                //showProgress(false);
-
                             }
 
                         }
@@ -201,18 +203,11 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            //Toast.makeText(getActivity(),"MYSQL insert ERROR "+error.getMessage(),Toast.LENGTH_LONG).show();
                             Toast.makeText(getActivity(),"ERROR! \n Server unavailable",Toast.LENGTH_LONG).show();
                             SQLiteConnect.getInstance(getContext()).updateStatusInvent(device.getId(),STATUS_SYNC_OFFLINE);
-
                             device.setStatusSync(STATUS_SYNC_OFFLINE);
                             device.setStatusInvent(STATUS_FINED);
-
                             myrecyclerview.getAdapter().notifyItemChanged(adapterPosition,device);
-                           // ic_server.setColorFilter(Color.RED);
-                           // ic_phone.setColorFilter(Color.GREEN);
-                            //showProgress(false);
-
                         }
                     }
             ){
@@ -252,8 +247,7 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
             Log.d(Values.TAG_LOG, "find: "+devices.size());
             recyclerViewAdapter.setUpdatedListOfDevices(devices);
             myrecyclerview.getAdapter().notifyDataSetChanged();
-           // myrecyclerview.setAdapter(new RecyclerViewAdapter((Context) mListener, devices, this));
-        } else {
+          } else {
             Toast.makeText(getContext(), "No find", Toast.LENGTH_LONG).show();
         }
     }
@@ -281,7 +275,6 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
     @Override
     public void dialogRespons(Device device) {
      //   myrecyclerview.getAdapter().notifyDataSetChanged();
-
         findDevices(etNumber.getText().toString());
     }
 

@@ -12,9 +12,9 @@
 
 
     <LinearLayout
-        android:fitsSystemWindows="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
         android:orientation="horizontal"
         android:paddingBottom="20dp"
         android:paddingTop="20dp">
@@ -64,36 +64,61 @@
         <!--tools:listitem="@layout/item" />-->
     </LinearLayout>
 
-    <FrameLayout
-
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="70dp"
+        android:orientation="horizontal">
 
-        >
 
-        <Switch
-            android:id="@+id/sw_invntory_btn"
+        <FrameLayout
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:text="Inventory (off/on)" />
 
-        <at.markushi.ui.CircleButton
-            android:id="@+id/btnScan"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="70dp"
-            android:layout_marginLeft="10dp"
-            android:adjustViewBounds="true"
-            android:cropToPadding="true"
-            android:fitsSystemWindows="true"
-            android:src="@android:drawable/ic_menu_camera"
-            app:cb_color="@color/colorPrimary"
-            app:cb_pressedRingWidth="8dip"
-            tools:ignore="VectorDrawableCompat" />
-    </FrameLayout>
+            >
+
+            <at.markushi.ui.CircleButton
+                android:id="@+id/btnScan"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="0dp"
+                android:layout_marginLeft="10dp"
+                android:adjustViewBounds="true"
+                android:cropToPadding="true"
+                android:fitsSystemWindows="true"
+                android:src="@android:drawable/ic_menu_camera"
+                app:cb_color="@color/colorPrimary"
+                app:cb_pressedRingWidth="8dip"
+                tools:ignore="VectorDrawableCompat" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <Switch
+                android:id="@+id/sw_invntory_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="Inventory (off/on)" />
+
+            <ImageButton
+                android:id="@+id/btn_invent_settings"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:src="@drawable/ic_more_vert_black_24dp"
+                android:text=". . ."
+                android:visibility="gone" />
+        </LinearLayout>
+
+
+    </LinearLayout>
 
 </LinearLayout>
