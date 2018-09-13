@@ -104,8 +104,7 @@ public class SyncFragment extends Fragment {
                         public void onResponse(String response) {
                             int responseSuccess = getSuccess(response);
                             if(responseSuccess !=0){
-                                // inset to SQLite SATATUS_ONLINE
-                                SQLiteConnect.getInstance(getContext()).updateStatusInvent(device.getId(), Values.STATUS_SYNC_ONLINE);
+                                SQLiteConnect.getInstance(getContext()).updateSyncStatus(device.getId(), Values.STATUS_SYNC_ONLINE);
                                 recyclerViewAdapter.setUpdatedListOfDevices(getNoSyncItems());
                                 adapter.notifyDataSetChanged();
                             }

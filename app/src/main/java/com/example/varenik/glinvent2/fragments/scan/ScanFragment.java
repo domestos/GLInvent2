@@ -180,7 +180,10 @@ public class ScanFragment extends Fragment implements View.OnClickListener, Comp
                             int responseSuccess = getSuccess(response);
                             if(responseSuccess !=0){
                                 // inset to SQLite SATATUS_ONLINE
+                                SQLiteConnect.getInstance(getContext()).updateSyncStatus(device.getId(), STATUS_SYNC_ONLINE);
                                 SQLiteConnect.getInstance(getContext()).updateStatusInvent(device.getId(), STATUS_SYNC_ONLINE);
+
+
 
                                 device.setStatusSync(STATUS_SYNC_ONLINE);
                                 device.setStatusInvent(STATUS_FINED);
