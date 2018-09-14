@@ -10,7 +10,7 @@ public class Values extends Application{
     public static String update_status_invent_url ="http://"+ host +"/PHPScript/db_update_status.php";
     public static String update_item="http://"+ host +"/PHPScript/db_update.php";
     public static String get_all_users="http://"+ host +"/PHPScript/db_get_all_users.php";
-
+    public static String reset_invent_status="http://"+host+"/PHPScript/db_reset_invent_status.php";
 
     public static String  TAG_LOG = "TAG_LOG";
     public static final int STATUS_SYNC_ONLINE = 0;
@@ -25,5 +25,7 @@ public class Values extends Application{
         update_status_invent_url ="http://"+url_host+"/PHPScript/db_update_status.php";
         update_item="http://"+url_host+"/PHPScript/db_update.php";
         get_all_users="http://"+url_host+"/PHPScript/db_get_all_users.php";
+        reset_invent_status="http://"+url_host+"/PHPScript/db_reset_invent_status.php";
     }
+
 }
