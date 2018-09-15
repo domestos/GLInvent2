@@ -2,6 +2,8 @@ package com.example.varenik.glinvent2.fragments.dialog;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,14 +13,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,26 +48,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.widget.Toast.LENGTH_LONG;
-
-public class DialogFragment extends android.support.v4.app.DialogFragment implements View.OnClickListener {
+public class DialogFragment extends android.support.v4.app.DialogFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
     private ArrayAdapter<String> adapterUsers;
+    private WebView webView;
+    private Switch sw_more;
     private ProgressBar progressBar;
     private String[] arrayLocation;
     private String[] arrayUsers;
     private List<User> allUsers;
     private ListView listSearchUser;
     private Spinner spLocation;
-
-    private LinearLayout infoError;
+    private  View view;
+    private LinearLayout infoError, ll_more_info;
+    private ImageButton btnOpenUrlInfo;
     private Button btnCancel, btnSave;
     private Device device;
-    private TextView txNumber, txItem;
-    private EditText edLocation, edOwner, edDescription;
+    private TextView txNumber, txItem, txUrlInfo;
+    private EditText edWksName, edOwner, edDescription;
     private OnDialogButtonSelected onDialogButtonSelected;
 
+
     public interface OnDialogButtonSelected{
-        void dialogRespons(Device device);
+        void dialogResponse(Device device);
     }
 
     public DialogFragment() {
@@ -84,7 +92,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dialog_item, container, false);
+        view = inflater.inflate(R.layout.dialog_item, container, false);
         Log.d(Values.TAG_LOG, "run onCreateView on DialogFragment");
         initAllViewElements(view);
         showProgress(false);
@@ -113,21 +121,54 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
                 device.setOwner(edOwner.getText().toString());
                 device.setDescription(edDescription.getText().toString());
                 editItem(device);
-//                onDialogButtonSelected.dialogRespons(device);
-
-                //save values
-                //getDialog().dismiss();
+                break;
+            case (R.id.btn_opne_url_info):
+                openUrlInfo(device.getUrlInfo());
                 break;
         }
 
     }
+
+    private void openUrlInfo(String urlInfo) {
+        Toast.makeText(getContext(), urlInfo, Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlInfo));
+        startActivity(intent);
+
+
+    }
+
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if(sw_more.isChecked()){
+            showMoreInfo(true );
+        }else {
+             showMoreInfo(false );
+        }
+    }
+
+    private void showMoreInfo(boolean b) {
+        if(b){
+            ll_more_info.setVisibility(View.VISIBLE);
+            btnOpenUrlInfo.setOnClickListener(this);
+            edWksName.setText(device.getNameWks());
+            txUrlInfo.setText(device.getUrlInfo());
+        }else{
+            ll_more_info.setVisibility(View.GONE);
+            }
+    }
+
 
     /**
      * ================ HELPER METHODS
      */
 
     private void initAllViewElements(View view) {
-        // edLocation = view.findViewById(R.id.ed_dialog_location);
+        ll_more_info = view.findViewById(R.id.ll_more_info);
+        btnOpenUrlInfo = view.findViewById(R.id.btn_opne_url_info);
+        txUrlInfo = view.findViewById(R.id.tx_url_info);
+        edWksName = view.findViewById(R.id.ed_wks_name);
+        sw_more = view.findViewById(R.id.sw_more);
         listSearchUser = view.findViewById(R.id.listSearchUsers);
         txNumber = view.findViewById(R.id.tx_dialog_number);
         txItem = view.findViewById(R.id.tx_dialog_item);
@@ -138,6 +179,12 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         //will NEED refactoring
         if (device != null) {
             Log.d(Values.TAG_LOG, device.getNumber());
+            if(device.getType().equals("Computer")){
+                sw_more.setVisibility(View.VISIBLE);
+                sw_more.setOnCheckedChangeListener(this);
+            }else{
+                sw_more.setVisibility(View.GONE);
+            }
             txNumber.setText(device.getNumber());
             txItem.setText(device.getItem());
             // edLocation.setText(device.getLocation());
@@ -285,7 +332,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
                                 // inset to SQLite SATATUS_ONLINE
                                 SQLiteConnect.getInstance(getContext()).updateItem(mDevice, Values.STATUS_SYNC_ONLINE);
                             }
-                            dialogRespons(mDevice);
+                            dialogResponse(mDevice);
                             showProgress(false);
                             getDialog().dismiss();
                         }
@@ -296,7 +343,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
                             SQLiteConnect.getInstance(getContext()).updateItem(mDevice, Values.STATUS_SYNC_OFFLINE);
                             infoError.setVisibility(View.VISIBLE);
                            // Toast.makeText(getContext(), "MYSQL ERROR " + error.getMessage(), LENGTH_LONG).show();
-                            dialogRespons(mDevice);
+                            dialogResponse(mDevice);
                             showProgress(false);
                         }
                     }
@@ -317,15 +364,16 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
 
     }
 
-    private void dialogRespons(Device mDevice) {
+    private void dialogResponse(Device mDevice) {
+
        switch (this.getTargetRequestCode()){
            //ScanFragment
            case 1:
-               onDialogButtonSelected.dialogRespons(mDevice);
+               onDialogButtonSelected.dialogResponse(mDevice);
                break;
            //SyncFragment
            case 2:
-               onDialogButtonSelected.dialogRespons(mDevice);
+               onDialogButtonSelected.dialogResponse(mDevice);
                break;
        }
     }

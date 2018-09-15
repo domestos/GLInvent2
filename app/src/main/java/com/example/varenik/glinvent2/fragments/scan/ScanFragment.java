@@ -68,22 +68,9 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
         // Required empty public constructor
     }
 
-//    // TODO: Rename and change types and number of parameters
-//    public static ScanFragment newInstance(String param1, String param2) {
-//        ScanFragment fragment = new ScanFragment();
-//        Bundle args = new Bundle();
-//
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (getArguments() != null) {
-//       //     mParam1 = getArguments().getString(ARG_PARAM1);
-//       //     mParam2 = getArguments().getString(ARG_PARAM2);
-//        }
     }
 
     @Override
@@ -112,13 +99,6 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
 
         return  view;
     }
-
-    // TODO: Rename method, update argument and hook method into UI event
-//    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
-//    }
 
     @Override
     public void onAttach(Context context) {
@@ -273,8 +253,7 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
     }
 
     @Override
-    public void dialogRespons(Device device) {
-     //   myrecyclerview.getAdapter().notifyDataSetChanged();
+    public void dialogResponse(Device device) {
         findDevices(etNumber.getText().toString());
     }
 
@@ -284,6 +263,5 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
         void onFragmentInteraction(Uri uri);
     }
 
-    public class OnScanFragmentInteractionListener {
-    }
+
 }

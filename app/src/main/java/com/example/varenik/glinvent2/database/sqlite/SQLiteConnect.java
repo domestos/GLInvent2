@@ -84,7 +84,7 @@ public class SQLiteConnect {
     public void insertAllItemToSQList(List<Device> devices) {
         Log.d(Values.TAG_LOG, "run insertAllItemToSQList");
         //
-        String sql = "INSERT INTO " + DBHelper.TABLE_INVENTORY + " VALUES(?,?,?,?,?,?,?,?,?);";
+        String sql = "INSERT INTO " + DBHelper.TABLE_INVENTORY + " VALUES(?,?,?,?,?,?,?,?,?,?,?);";
         SQLiteStatement sqLiteStatement = sqLiteDatabase.compileStatement(sql);
         if (devices != null) {
             sqLiteDatabase.beginTransaction();
@@ -96,26 +96,30 @@ public class SQLiteConnect {
 
                     sqLiteStatement.bindLong(1, devices.get(i).getId());
                     sqLiteStatement.bindString(2, devices.get(i).getNumber().trim());
-                    sqLiteStatement.bindString(3, devices.get(i).getItem());
-                    sqLiteStatement.bindString(4, devices.get(i).getName_wks().trim());
-                    sqLiteStatement.bindString(5, devices.get(i).getOwner().trim());
-                    sqLiteStatement.bindString(6, devices.get(i).getLocation().trim());
-                    sqLiteStatement.bindString(7, devices.get(i).getStatusInvent());
-                    sqLiteStatement.bindLong(8, Values.STATUS_SYNC_ONLINE);
-                    sqLiteStatement.bindString(9, devices.get(i).getDescription());
+                    sqLiteStatement.bindString(3, devices.get(i).getType().trim());
+                    sqLiteStatement.bindString(4, devices.get(i).getItem());
+                    sqLiteStatement.bindString(5, devices.get(i).getNameWks().trim());
+                    sqLiteStatement.bindString(6, devices.get(i).getOwner().trim());
+                    sqLiteStatement.bindString(7, devices.get(i).getLocation().trim());
+                    sqLiteStatement.bindString(8, devices.get(i).getStatusInvent());
+                    sqLiteStatement.bindLong(9, Values.STATUS_SYNC_ONLINE);
+                    sqLiteStatement.bindString(10, devices.get(i).getDescription());
+                    sqLiteStatement.bindString(11, devices.get(i).getUrlInfo());
                     sqLiteStatement.execute();
 
                     /*
                     *
                     1 KEY_ID+" integer primary key, "+
                     2 KEY_NUMBER+" text, "+
-                    3 KEY_ITEM+" text, "+
-                    4 KEY_NAME_WKS+" text, "+
-                    5 KEY_OWNER+" text, "+
-                    6 KEY_LOCATION+" text, "+
-                    7 KEY_STATUS_INVENT+" text, "+
-                    8 KEY_STATUS_SYNC+" integer, "+
-                    9 KEY_DESCRIPTION +" text "+*/
+                    3 KEY_TYPE+" text, "+
+                    4 KEY_ITEM+" text, "+
+                    5 KEY_NAME_WKS+" text, "+
+                    6 KEY_OWNER+" text, "+
+                    7 KEY_LOCATION+" text, "+
+                    8 KEY_STATUS_INVENT+" text, "+
+                    9 KEY_STATUS_SYNC+" integer, "+
+                    10 KEY_DESCRIPTION +" text "+
+                    11 KEY_URL_INFO +" text "+*/
                 }
                 sqLiteDatabase.setTransactionSuccessful();
 
@@ -198,11 +202,15 @@ public class SQLiteConnect {
         Device device = null;
         String[] selectArgs = new String[]{number};
         String select = DBHelper.KEY_NUMBER + " = ? ";
-        //Device devices = new Device();
         Cursor cursor = sqLiteDatabase.query(DBHelper.TABLE_INVENTORY, null, select, selectArgs, null, null, null);
-        devices = wrapperDevices(cursor);
-        cursor.close();
-        return devices;
+        if(cursor.moveToFirst()){
+            devices = wrapperDevices(cursor);
+            cursor.close();
+            return devices;
+        }else {
+            cursor.close();
+            return null;
+        }
     }
 
     // ================= getNoSyncItemsFromSQLite ==================================================
@@ -232,6 +240,13 @@ public class SQLiteConnect {
 
     }
 
+    public void resetStatusInvent() {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DBHelper.KEY_STATUS_INVENT, "");
+        sqLiteDatabase.update(DBHelper.TABLE_INVENTORY, contentValues, null, null);
+
+    }
+
     public void updateItem(Device device, int statusSync) {
         //UPDATE wp_inventor SET status_sync = "statusSyncOnline", status_invent="ok" where id = id
         String[] whereArgs = new String[]{String.valueOf(device.getId())};
@@ -251,13 +266,15 @@ public class SQLiteConnect {
                         new Device(
                                 cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_ID)),
                                 cursor.getString(cursor.getColumnIndex(DBHelper.KEY_NUMBER)),
+                                cursor.getString(cursor.getColumnIndex(DBHelper.KEY_TYPE)),
                                 cursor.getString(cursor.getColumnIndex(DBHelper.KEY_ITEM)),
                                 cursor.getString(cursor.getColumnIndex(DBHelper.KEY_NAME_WKS)),
                                 cursor.getString(cursor.getColumnIndex(DBHelper.KEY_OWNER)),
                                 cursor.getString(cursor.getColumnIndex(DBHelper.KEY_LOCATION)),
                                 cursor.getString(cursor.getColumnIndex(DBHelper.KEY_STATUS_INVENT)),
                                 cursor.getInt(cursor.getColumnIndex(DBHelper.KEY_STATUS_SYNC)),
-                                cursor.getString(cursor.getColumnIndex(DBHelper.KEY_DESCRIPTION))
+                                cursor.getString(cursor.getColumnIndex(DBHelper.KEY_DESCRIPTION)),
+                                cursor.getString(cursor.getColumnIndex(DBHelper.KEY_URL_INFO))
                         )
                 );
             }

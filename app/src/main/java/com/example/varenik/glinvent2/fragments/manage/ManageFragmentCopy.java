@@ -372,13 +372,15 @@ public class ManageFragmentCopy extends android.support.v4.app.Fragment implemen
                     devices.add(new Device(
                             JO.getInt("id"),
                             JO.getString("number"),
+                            JO.getString("type"),
                             JO.getString("item"),
                             JO.getString("name_wks"),
                             JO.getString("owner"),
                             JO.getString("location"),
                             JO.getString("status_invent"),
                             Values.STATUS_SYNC_ONLINE,
-                            JO.getString("description")
+                            JO.getString("description"),
+                            JO.getString("url_info")
                     ));
                 }
                 //  Log.d(TAG, "getArrayDevices: count row = " + products.length());

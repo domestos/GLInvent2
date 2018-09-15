@@ -67,6 +67,7 @@ public class DialogInventSettingFragment extends DialogFragment {
                     public void onResponse(String response) {
                         int responseSuccess = getSuccess(response);
                         if (responseSuccess != 0) {
+                            SQLiteConnect.getInstance(getContext()).resetStatusInvent();
                             Toast.makeText(getContext(), "Success", Toast.LENGTH_LONG).show();
                         }
                     }

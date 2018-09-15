@@ -158,7 +158,7 @@ public class SyncFragment extends Fragment implements DialogFragment.OnDialogBut
     }
 
     @Override
-    public void dialogRespons(Device device){
+    public void dialogResponse(Device device){
         myrecyclerview.getAdapter().notifyDataSetChanged();
     }
 }

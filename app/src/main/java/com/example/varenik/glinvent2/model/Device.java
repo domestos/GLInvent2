@@ -11,6 +11,8 @@ public class Device implements Parcelable {
 
     private int id ;
     private String number;
+    private String type;
+    private String url_info;
     private String item;
     private String name_wks;
     private String owner;
@@ -19,9 +21,10 @@ public class Device implements Parcelable {
     private Integer statusSync;
     private String description;
 
-    public Device(int id, String number, String item, String name_wks, String owner, String location, String statusInvent, Integer statusSync, String description) {
+    public Device(int id, String number, String type, String item, String name_wks, String owner, String location, String statusInvent, Integer statusSync, String description, String url_info) {
         this.id = id;
         this.number = number;
+        this.type = type;
         this.item = item;
         this.owner = owner;
         this.location = location;
@@ -29,11 +32,14 @@ public class Device implements Parcelable {
         this.statusInvent = statusInvent;
         this.statusSync = statusSync;
         this.name_wks = name_wks;
+        this.url_info = url_info;
     }
 
     protected Device(Parcel in) {
         id = in.readInt();
         number = in.readString();
+
+        type = in.readString();
         item = in.readString();
         name_wks = in.readString();
         owner = in.readString();
@@ -41,6 +47,7 @@ public class Device implements Parcelable {
         statusInvent = in.readString();
         statusSync = in.readInt();
         description = in.readString();
+        url_info = in.readString();
     }
 
     public static final Creator<Device> CREATOR = new Creator<Device>() {
@@ -119,12 +126,20 @@ public class Device implements Parcelable {
         this.description = description;
     }
 
-    public String getName_wks() {
+    public String getNameWks() {
         return name_wks;
     }
 
     public void setName_wks(String name_wks) {
         this.name_wks = name_wks;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getUrlInfo() {
+        return url_info;
     }
 
     @Override
@@ -136,6 +151,7 @@ public class Device implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(id);
         parcel.writeString(number);
+        parcel.writeString(type);
         parcel.writeString(item);
         parcel.writeString(name_wks);
         parcel.writeString(owner);
@@ -143,5 +159,6 @@ public class Device implements Parcelable {
         parcel.writeString(statusInvent);
         parcel.writeInt(statusSync);
         parcel.writeString(description);
+        parcel.writeString(url_info);
     }
 }
