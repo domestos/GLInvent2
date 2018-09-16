@@ -213,6 +213,22 @@ public class SQLiteConnect {
         }
     }
 
+    public Integer getCountItems(String type) {
+        String[] selectArgs = new String[]{type};
+        String select = DBHelper.KEY_TYPE + " = ? ";
+        Cursor cursor = sqLiteDatabase.query(DBHelper.TABLE_INVENTORY, null, select, selectArgs, null, null, null);
+        Log.d(Values.TAG_LOG, "SQLiteConnect getCountItems: "+ type+": " + cursor.getCount());
+        return  cursor.getCount();
+    }
+
+    public Integer getFindCountItems(String type){
+        String[] selectArgs = new String[]{type,Values.STATUS_FINED};
+        String select = DBHelper.KEY_TYPE + " = ? AND " + DBHelper.KEY_STATUS_INVENT+" = ?";
+        Cursor cursor = sqLiteDatabase.query(DBHelper.TABLE_INVENTORY, null, select, selectArgs, null, null, null);
+        Log.d(Values.TAG_LOG, "SQLiteConnect getCountItems: "+ type+": " + cursor.getCount());
+        return  cursor.getCount();
+    }
+
     // ================= getNoSyncItemsFromSQLite ==================================================
     public List<Device> getNoSyncItemsFromSQLite() {
         Log.d(Values.TAG_LOG, "SQLiteConnect getNoSyncItemsFromSQLite");
@@ -253,6 +269,7 @@ public class SQLiteConnect {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DBHelper.KEY_STATUS_SYNC, statusSync);
         contentValues.put(DBHelper.KEY_OWNER, device.getOwner());
+        contentValues.put(DBHelper.KEY_NAME_WKS, device.getNameWks());
         contentValues.put(DBHelper.KEY_LOCATION, device.getLocation());
         contentValues.put(DBHelper.KEY_DESCRIPTION, device.getDescription());
         sqLiteDatabase.update(DBHelper.TABLE_INVENTORY, contentValues, DBHelper.KEY_ID + " = ? ", whereArgs);
@@ -320,5 +337,6 @@ public class SQLiteConnect {
                sqLiteDatabase.delete(DBHelper.TABLE_USERS,null, null);
         return sqLiteDatabase.delete(DBHelper.TABLE_INVENTORY, null, null);
     }
+
 
 }

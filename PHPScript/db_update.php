@@ -8,6 +8,7 @@ if (isset($_POST['id']) ) {
 
     $id = $_POST['id'];
     $number = $_POST['number'];
+    $name_wks = $_POST['name_wks'];
     $owner = $_POST['owner'];
     $location = $_POST['location'];
     $description = $_POST['description'];
@@ -17,10 +18,10 @@ if (isset($_POST['id']) ) {
  
     $db = new DB_CONNECT();
  
-    if(isset($_POST['method'] )){    	
-    	$result = mysql_query("UPDATE wp_inventory SET  status_invent = $status_invent WHERE id = $id");
+    if(isset($_POST['method'] )){       
+        $result = mysql_query("UPDATE wp_inventory SET  status_invent = $status_invent WHERE id = $id");
     }else{
-    	$result = mysql_query("UPDATE wp_inventory SET owner = '$owner', location = '$location', description = '$description', status_invent = '$status_invent' WHERE id = $id");
+        $result = mysql_query("UPDATE wp_inventory SET name_wks='$name_wks', owner = '$owner', location = '$location', description = '$description', status_invent = '$status_invent' WHERE id = $id");
     }
 
 
@@ -44,3 +45,13 @@ if (isset($_POST['id']) ) {
     echo json_encode($response);
 }
 ?>
+
+
+
+
+
+
+
+
+
+

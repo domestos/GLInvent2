@@ -228,6 +228,8 @@ public class ScanFragment extends Fragment implements DialogFragment.OnDialogBut
             recyclerViewAdapter.setUpdatedListOfDevices(devices);
             myrecyclerview.getAdapter().notifyDataSetChanged();
           } else {
+            recyclerViewAdapter.setUpdatedListOfDevices(devices);
+            myrecyclerview.getAdapter().notifyDataSetChanged();
             Toast.makeText(getContext(), "No find", Toast.LENGTH_LONG).show();
         }
     }

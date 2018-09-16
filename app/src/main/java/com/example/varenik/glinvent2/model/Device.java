@@ -130,7 +130,7 @@ public class Device implements Parcelable {
         return name_wks;
     }
 
-    public void setName_wks(String name_wks) {
+    public void setNameWks(String name_wks) {
         this.name_wks = name_wks;
     }
 

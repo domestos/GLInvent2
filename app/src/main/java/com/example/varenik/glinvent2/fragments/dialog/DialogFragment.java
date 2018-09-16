@@ -13,18 +13,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,17 +45,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DialogFragment extends android.support.v4.app.DialogFragment implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class DialogFragment extends android.support.v4.app.DialogFragment implements View.OnClickListener {
     private ArrayAdapter<String> adapterUsers;
-    private WebView webView;
-    private Switch sw_more;
     private ProgressBar progressBar;
     private String[] arrayLocation;
     private String[] arrayUsers;
     private List<User> allUsers;
     private ListView listSearchUser;
     private Spinner spLocation;
-    private  View view;
+    private View view;
     private LinearLayout infoError, ll_more_info;
     private ImageButton btnOpenUrlInfo;
     private Button btnCancel, btnSave;
@@ -120,6 +115,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
                 Log.d(Values.TAG_LOG, "onClick: save values from dialog");
                 device.setOwner(edOwner.getText().toString());
                 device.setDescription(edDescription.getText().toString());
+                device.setNameWks(edWksName.getText().toString());
                 editItem(device);
                 break;
             case (R.id.btn_opne_url_info):
@@ -133,19 +129,9 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         Toast.makeText(getContext(), urlInfo, Toast.LENGTH_LONG).show();
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlInfo));
         startActivity(intent);
-
-
     }
 
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if(sw_more.isChecked()){
-            showMoreInfo(true );
-        }else {
-             showMoreInfo(false );
-        }
-    }
 
     private void showMoreInfo(boolean b) {
         if(b){
@@ -168,7 +154,6 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         btnOpenUrlInfo = view.findViewById(R.id.btn_opne_url_info);
         txUrlInfo = view.findViewById(R.id.tx_url_info);
         edWksName = view.findViewById(R.id.ed_wks_name);
-        sw_more = view.findViewById(R.id.sw_more);
         listSearchUser = view.findViewById(R.id.listSearchUsers);
         txNumber = view.findViewById(R.id.tx_dialog_number);
         txItem = view.findViewById(R.id.tx_dialog_item);
@@ -180,10 +165,9 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         if (device != null) {
             Log.d(Values.TAG_LOG, device.getNumber());
             if(device.getType().equals("Computer")){
-                sw_more.setVisibility(View.VISIBLE);
-                sw_more.setOnCheckedChangeListener(this);
+                showMoreInfo(true);
             }else{
-                sw_more.setVisibility(View.GONE);
+                showMoreInfo(false);
             }
             txNumber.setText(device.getNumber());
             txItem.setText(device.getItem());
@@ -263,7 +247,6 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         edOwner.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
-
                 if (!b) {
                     listSearchUser.setVisibility(View.GONE);
                 }
@@ -352,6 +335,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> params = new HashMap<String, String>();
                     params.put("id", String.valueOf(mDevice.getId()));
+                    params.put("name_wks", mDevice.getNameWks());
                     params.put("owner", mDevice.getOwner());
                     params.put("location", mDevice.getLocation());
                     params.put("description", mDevice.getDescription());

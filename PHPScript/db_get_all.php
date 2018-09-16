@@ -17,6 +17,7 @@ if (mysql_num_rows($result) > 0) {
         $product = array();
         $product["id"] = $row["id"];
         $product["number"] = $row["number"];
+        $product["type"] = $row["type"];
         $product["item"] = $row["item"];
         $product["name_wks"] = $row["name_wks"];
         $product["owner"] = $row["owner"];
@@ -24,7 +25,7 @@ if (mysql_num_rows($result) > 0) {
         $product["status_invent"] = $row["status_invent"];
       //  $product["status_sync"] = $row["status_sync"];
         $product["description"] = $row["description"];
-
+        $product["url_info"] = $row["url_info"];
       array_push($response["products"], $product);
     }
 
@@ -38,3 +39,4 @@ if (mysql_num_rows($result) > 0) {
     echo  json_encode($response);
 }
 ?>
+

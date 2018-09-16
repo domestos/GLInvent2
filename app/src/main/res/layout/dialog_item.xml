@@ -100,11 +100,6 @@
                 android:textColor="#000"
                 android:textStyle="bold" />
 
-            <Switch
-                android:id="@+id/sw_more"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="more" />
         </LinearLayout>
 
         <TextView
