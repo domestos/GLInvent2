@@ -164,7 +164,7 @@ public class DialogFragment extends android.support.v4.app.DialogFragment implem
         //will NEED refactoring
         if (device != null) {
             Log.d(Values.TAG_LOG, device.getNumber());
-            if(device.getType().equals("Computer")){
+            if(device.getType().equals("Computer") || device.getType().equals("Apple Mac mini") ){
                 showMoreInfo(true);
             }else{
                 showMoreInfo(false);
