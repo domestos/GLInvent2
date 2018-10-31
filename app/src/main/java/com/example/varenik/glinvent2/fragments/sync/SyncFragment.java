@@ -120,9 +120,13 @@ public class SyncFragment extends Fragment implements DialogFragment.OnDialogBut
             ){
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
+                    /* use php script db_update.php*/
                     Map<String, String> params  = new HashMap<String, String>();
                     Log.d(TAG, "syncAll: ID)"+String.valueOf(device.getId()));
                     params.put("id", String.valueOf(device.getId()));
+
+                    Log.d(TAG, "syncAll: name_wks "+device.getNameWks());
+                    params.put("name_wks",device.getNameWks());
 
                     Log.d(TAG, "syncAll: Status Invent "+device.getStatusInvent());
                     params.put("status_invent",device.getStatusInvent());
