@@ -200,8 +200,8 @@ public class SQLiteConnect {
         Log.d(Values.TAG_LOG, "SQLiteConnect getDevicesFromSQLite");
         List<Device> devices = new ArrayList<Device>();
         Device device = null;
-        String[] selectArgs = new String[]{number};
-        String select = DBHelper.KEY_NUMBER + " = ? ";
+        String[] selectArgs = new String[]{'%'+ number +'%'};
+        String select = DBHelper.KEY_NUMBER + " LIKE ?";
         Cursor cursor = sqLiteDatabase.query(DBHelper.TABLE_INVENTORY, null, select, selectArgs, null, null, null);
         if(cursor.moveToFirst()){
             devices = wrapperDevices(cursor);
