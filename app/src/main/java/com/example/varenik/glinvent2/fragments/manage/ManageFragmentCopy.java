@@ -269,42 +269,10 @@ public class ManageFragmentCopy extends android.support.v4.app.Fragment implemen
 
     //===================================================
 
+
+
     private List<Device> getAllItemsFromMySQL() {
         Log.d(Values.TAG_LOG, "run getAllItemsFromMySQL");
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Values.server_url,
-                new Response.Listener<JSONObject>() {
-
-                    public void onResponse(JSONObject response) {
-                        //  Log.d(Const.TAG_LOG, response.toString());
-                        devicesFromMySQL = getArrayDevices(response);
-
-                        if (devicesFromMySQL != null) {
-                            tvDevicesRowInMYSQL.setText(String.valueOf(devicesFromMySQL.size()));
-                            Log.d(Values.TAG_LOG, " result: Devices From MySQL =" + devicesFromMySQL.size());
-                            tvConnectStatus.setTextColor(Color.GREEN);
-                            tvConnectStatus.setText("Connected");
-                        } else {
-                            Log.d(Values.TAG_LOG, "result:  Devices From MySQL NULL");
-                            showCountRowInMYSQL();
-                        }
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        devicesFromMySQL =null;
-                        showCountRowInMYSQL();
-                        tvConnectStatus.setTextColor(Color.RED);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                     //       tvConnectStatus.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                        }
-                        tvConnectStatus.setText("Host is unavailable. \n Check URL or Internet connection ");
-                        Toast.makeText(getContext(), "getAllItemsFromMySQL", Toast.LENGTH_SHORT).show();
-                    }
-                }
-        );
-        MySQLConnect.getInstance(getContext().getApplicationContext()).addToRequestque(jsonObjectRequest);
         return devicesFromMySQL;
     }
 
@@ -313,36 +281,86 @@ public class ManageFragmentCopy extends android.support.v4.app.Fragment implemen
         //  Log.d(Const.TAG_LOG, Const.get_all_users+"");
 
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Values.get_all_users,
 
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        //                 Log.d(Const.TAG_LOG, response.toString());
-                        usersFromMySQL = getArrayUsers(response);
 
-                        if (usersFromMySQL != null) {
-                            tvUsersRowInMYSQL.setText(String.valueOf(usersFromMySQL.size()));
-                            Log.d(Values.TAG_LOG, " result: Users From MySQL =" + usersFromMySQL.size());
-                        } else {
-                            Log.d(Values.TAG_LOG, "result:  Users From MySQL NULL");
-                        }
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                     //   tvUsersRowInMYSQL.setTextColor(Color.RED);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                       //     tvUsersRowInMYSQL.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                        }
-                    }
-                }
-        );
-        MySQLConnect.getInstance(getContext().getApplicationContext()).addToRequestque(jsonObjectRequest);
         return usersFromMySQL;
     }
+
+
+//    private List<Device> getAllItemsFromMySQL() {
+//        Log.d(Values.TAG_LOG, "run getAllItemsFromMySQL");
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Values.server_url,
+//                new Response.Listener<JSONObject>() {
+//
+//                    public void onResponse(JSONObject response) {
+//                        //  Log.d(Const.TAG_LOG, response.toString());
+//                        devicesFromMySQL = getArrayDevices(response);
+//
+//                        if (devicesFromMySQL != null) {
+//                            tvDevicesRowInMYSQL.setText(String.valueOf(devicesFromMySQL.size()));
+//                            Log.d(Values.TAG_LOG, " result: Devices From MySQL =" + devicesFromMySQL.size());
+//                            tvConnectStatus.setTextColor(Color.GREEN);
+//                            tvConnectStatus.setText("Connected");
+//                        } else {
+//                            Log.d(Values.TAG_LOG, "result:  Devices From MySQL NULL");
+//                            showCountRowInMYSQL();
+//                        }
+//
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        devicesFromMySQL =null;
+//                        showCountRowInMYSQL();
+//                        tvConnectStatus.setTextColor(Color.RED);
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//                     //       tvConnectStatus.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+//                        }
+//                        tvConnectStatus.setText("Host is unavailable. \n Check URL or Internet connection ");
+//                        Toast.makeText(getContext(), "getAllItemsFromMySQL", Toast.LENGTH_SHORT).show();
+//                    }
+//                }
+//        );
+//        MySQLConnect.getInstance(getContext().getApplicationContext()).addToRequestque(jsonObjectRequest);
+//        return devicesFromMySQL;
+//    }
+//
+//    private List<User> getAllUsersFromMySQL() {
+//        Log.d(Values.TAG_LOG, "run getAllUsersFromMySQL");
+//        //  Log.d(Const.TAG_LOG, Const.get_all_users+"");
+//
+//
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Values.get_all_users,
+//
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        //                 Log.d(Const.TAG_LOG, response.toString());
+//                        usersFromMySQL = getArrayUsers(response);
+//
+//                        if (usersFromMySQL != null) {
+//                            tvUsersRowInMYSQL.setText(String.valueOf(usersFromMySQL.size()));
+//                            Log.d(Values.TAG_LOG, " result: Users From MySQL =" + usersFromMySQL.size());
+//                        } else {
+//                            Log.d(Values.TAG_LOG, "result:  Users From MySQL NULL");
+//                        }
+//
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                     //   tvUsersRowInMYSQL.setTextColor(Color.RED);
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+//                       //     tvUsersRowInMYSQL.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+//                        }
+//                    }
+//                }
+//        );
+//        MySQLConnect.getInstance(getContext().getApplicationContext()).addToRequestque(jsonObjectRequest);
+//        return usersFromMySQL;
+//    }
 
     private void deleteAllFromSQLite() {
         if (SQLiteConnect.getInstance(getContext()).getNoSyncItemsFromSQLite().isEmpty()) {

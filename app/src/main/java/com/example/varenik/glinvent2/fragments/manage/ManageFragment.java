@@ -167,37 +167,35 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
     }
 
     //===================== Server methods ===============================
-
     private List<Device> getAllItemsFromMySQL() {
         Log.d(Values.TAG_LOG, "run getAllItemsFromMySQL");
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Values.server_url,
-                new Response.Listener<JSONObject>() {
-
-                    public void onResponse(JSONObject response) {
-                        tvConnectStatus.setText("Connected");
-                        tvConnectStatus.setTextColor(Color.GREEN);
-                        if((devicesFromServer = getArrayDevices(response) ) != null){
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Values.server_url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                tvConnectStatus.setText("Connected");
+                tvConnectStatus.setTextColor(Color.GREEN);
+                if((devicesFromServer = getArrayDevices(response) ) != null){
                             tvDevicesRowInMYSQL.setText(String.valueOf(devicesFromServer.size()));
                         }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        devicesFromServer = null;
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                devicesFromServer = null;
                         tvDevicesRowInMYSQL.setText("-NULL");
                         tvConnectStatus.setText("Host is unavailable. \n Check URL or Internet connection ");
-                        tvConnectStatus.setTextColor(Color.RED);
-                    }
-                }
-        );
+                       tvConnectStatus.setTextColor(Color.RED);
+            }
+        });
         MySQLConnect.getInstance(getContext().getApplicationContext()).addToRequestque(jsonObjectRequest);
         return devicesFromServer;
     }
 
+
     private List<User> getAllUsersFromMySQL() {
         Log.d(Values.TAG_LOG, "run getAllUsersFromMySQL");
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Values.get_all_users,
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, Values.get_all_users,null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
