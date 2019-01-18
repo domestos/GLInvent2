@@ -174,6 +174,7 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
             public void onResponse(JSONObject response) {
                 tvConnectStatus.setText("Connected");
                 tvConnectStatus.setTextColor(Color.GREEN);
+                Log.d(Values.TAG_LOG, "run jsonObjectRequest = " + response);
                 if((devicesFromServer = getArrayDevices(response) ) != null){
                             tvDevicesRowInMYSQL.setText(String.valueOf(devicesFromServer.size()));
                         }
@@ -183,6 +184,7 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
             @Override
             public void onErrorResponse(VolleyError error) {
                 devicesFromServer = null;
+                Log.d(Values.TAG_LOG, " Error" + error);
                         tvDevicesRowInMYSQL.setText("-NULL");
                         tvConnectStatus.setText("Host is unavailable. \n Check URL or Internet connection ");
                        tvConnectStatus.setTextColor(Color.RED);
@@ -221,8 +223,10 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
 
     // ============================= HELPER METHOD =================================================
     private ArrayList<Device> getArrayDevices(JSONObject response) {
+        Log.d(Values.TAG_LOG, "run getArrayDevices" + response);
         ArrayList<Device> devices = new ArrayList<Device>();
         try {
+            Log.d(Values.TAG_LOG, "run response" + response);
             if (response.get("success").equals(1)) {
                 JSONArray products = (JSONArray) response.get("products");
                 for (int i = 0; i < products.length(); i++) {
@@ -240,6 +244,7 @@ public class ManageFragment extends android.support.v4.app.Fragment implements V
                             JO.getString("description"),
                             JO.getString("url_info")
                     ));
+
                 }
                 //  Log.d(TAG, "getArrayDevices: count row = " + products.length());
             }
